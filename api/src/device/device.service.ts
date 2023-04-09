@@ -11,10 +11,7 @@ export class DeviceService {
     private deviceRepository: Repository<Device>,
     private readonly mqttService: MqttService,
   ) {
-    this.mqttService.subscribe('casa-1', (msg) => {
-      console.log(`Received message: ${msg}`);
-    });
-    this.mqttService.subscribe('casa-2', (msg) => {
+    this.mqttService.subscribe('casa', (msg) => {
       console.log(`Received message: ${msg}`);
     });
   }
