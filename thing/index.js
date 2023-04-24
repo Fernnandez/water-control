@@ -9,9 +9,9 @@ client.on('connect', () => {
   setInterval(() => {
     const message = { volume: count };
 
-    client.publish('casa', JSON.stringify(message));
+    client.publish('127.123.0.1-casa', JSON.stringify(message));
     count++;
-  }, 1000);
+  }, 60 * 1000);
 });
 
 client.on('error', (error) => {

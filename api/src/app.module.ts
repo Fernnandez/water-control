@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DeviceModule } from './device/device.module';
 import { Device } from './device/device.entity';
+import { DeviceModule } from './device/device.module';
 import { MqttModule } from './mqtt/mqtt.module';
+import { DeviceHistory } from './device/deviceHistory.entity';
 
 @Module({
   imports: [
@@ -14,11 +15,12 @@ import { MqttModule } from './mqtt/mqtt.module';
       username: 'dev',
       password: 'dev_pass',
       database: 'water_db',
-      entities: [Device],
+      entities: [Device, DeviceHistory],
       synchronize: true,
     }),
     DeviceModule,
     MqttModule,
   ],
+  providers: [],
 })
 export class AppModule {}
