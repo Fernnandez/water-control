@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { MqttService } from './../mqtt/mqtt.service';
-import { Device } from './device.entity';
+import { MqttService } from '../../mqtt/mqtt.service';
+import { Device } from '../entity/device.entity';
 import { DeviceHistoryService } from './deviceHistory.service';
 
 @Injectable()
@@ -19,10 +19,11 @@ export class DeviceService {
         console.log(`Subscribing to ${device.topic}`);
         this.mqttService.subscribe(device.topic, (msg) => {
           console.log(msg);
-          // TODO - Update device's History
+          const dto = JSON.parse(msg);
           this.deviceHistoryService.create({
-            volume: JSON.parse(msg).volume,
-            timestamp: new Date(),
+            volume: dto.volume,
+            percentage: dto.percentage,
+            timestamp: new Date(dto.timestamp),
             device,
           });
         });
@@ -38,11 +39,32 @@ export class DeviceService {
     return await this.deviceRepository.findOne({ where: { id } });
   }
 
-  async findByName(name: string): Promise<Device> {
-    return await this.deviceRepository.findOne({ where: { name } });
+  async findAllWithHistory() {
+    const devices = await this.deviceRepository.find({
+      relations: ['devicesHistory'],
+    });
+
+    return devices.map((device) => {
+      return {
+        ...device,
+        volume:
+          device?.devicesHistory[device?.devicesHistory?.length - 1]?.volume ||
+          0,
+        totalVolume: device.maxCapacity,
+        percentage:
+          device?.devicesHistory[device?.devicesHistory?.length - 1]
+            ?.percentage || 0,
+      };
+    });
   }
 
-  async findAll(): Promise<Device[]> {
-    return await this.deviceRepository.find();
+  async findByName(name: string): Promise<Device> {
+    return await this.deviceRepository.findOne({
+      where: { name },
+    });
+  }
+
+  findAll(): Promise<Device[]> {
+    return this.deviceRepository.find();
   }
 }

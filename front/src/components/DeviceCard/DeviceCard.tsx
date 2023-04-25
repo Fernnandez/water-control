@@ -4,14 +4,16 @@ import { GiWaterTower } from 'react-icons/gi';
 interface DeviceCardProps {
   active: boolean;
   name: string;
+  action: () => void;
 }
 
-export const DeviceCard = ({ active, name }: DeviceCardProps) => {
+export const DeviceCard = ({ active, name, action }: DeviceCardProps) => {
   return (
     <Card
       shadow="lg"
       p="xl"
       radius="md"
+      onClick={action}
       sx={(theme) => ({
         width: rem(150),
         height: rem(150),

@@ -9,6 +9,12 @@ export class DeviceHistory {
   @Column()
   volume: number;
 
+  @Column()
+  percentage: number;
+
+  @Column()
+  timestamp: Date;
+
   @ManyToOne(() => Device, (device) => device.devicesHistory)
   device: Device;
 }

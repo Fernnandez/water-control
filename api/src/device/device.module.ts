@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MqttModule } from '../mqtt/mqtt.module';
-import { DeviceController } from './device.controller';
-import { Device } from './device.entity';
-import { DeviceService } from './device.service';
-import { DeviceHistory } from './deviceHistory.entity';
-import { DeviceHistoryService } from './deviceHistory.service';
+import { DeviceController } from './controller/device.controller';
+import { Device } from './entity/device.entity';
+import { DeviceService } from './service/device.service';
+import { DeviceHistory } from './entity/deviceHistory.entity';
+import { DeviceHistoryService } from './service/deviceHistory.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Device, DeviceHistory]), MqttModule],

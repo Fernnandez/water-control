@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Device } from './device/device.entity';
+import { Device } from './device/entity/device.entity';
 import { DeviceModule } from './device/device.module';
 import { MqttModule } from './mqtt/mqtt.module';
-import { DeviceHistory } from './device/deviceHistory.entity';
+import { DeviceHistory } from './device/entity/deviceHistory.entity';
 
 @Module({
   imports: [
