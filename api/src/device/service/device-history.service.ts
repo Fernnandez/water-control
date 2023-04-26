@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Device } from '../entity/device.entity';
-import { DeviceHistory } from '../entity/deviceHistory.entity';
+import { DeviceHistory } from '../entity/device-history.entity';
 
 @Injectable()
 export class DeviceHistoryService {
@@ -13,14 +13,13 @@ export class DeviceHistoryService {
 
   async create(dto: {
     volume: number;
-    percentage: number;
+    battery: number;
     timestamp: Date;
     device: Device;
   }): Promise<DeviceHistory> {
-    console.log(Number(dto.volume / dto.device.maxCapacity));
     return await this.deviceHisotryRepository.save({
-      volume: dto.volume,
-      percentage: dto.percentage,
+      water: dto.volume,
+      battery: dto.battery,
       timestamp: dto.timestamp,
       device: dto.device,
     });

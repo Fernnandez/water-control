@@ -7,10 +7,10 @@ export class DeviceHistory {
   id: string;
 
   @Column()
-  volume: number;
+  battery: number;
 
   @Column()
-  percentage: number;
+  water: number;
 
   @Column()
   timestamp: Date;

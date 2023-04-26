@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { MqttService } from '../../mqtt/mqtt.service';
+import { CreateDeviceDTO } from '../controller/device.controller';
 import { Device } from '../entity/device.entity';
-import { DeviceHistoryService } from './deviceHistory.service';
+import { DeviceHistoryService } from './device-history.service';
 
 @Injectable()
 export class DeviceService {
@@ -16,55 +17,47 @@ export class DeviceService {
     // TODO - Subscribe to MQTT topic of each one devices
     this.findAll().then((res) =>
       res.forEach((device) => {
-        console.log(`Subscribing to ${device.topic}`);
-        this.mqttService.subscribe(device.topic, (msg) => {
-          console.log(msg);
+        console.log(`Subscribing to ${device.mac}`);
+        this.mqttService.subscribe(device.mac, (msg) => {
           const dto = JSON.parse(msg);
           this.deviceHistoryService.create({
             volume: dto.volume,
-            percentage: dto.percentage,
+            battery: dto.battery,
             timestamp: new Date(dto.timestamp),
             device,
+          });
+          this.deviceRepository.update(device.id, {
+            percentage: Number(dto.percentage),
+            battery: dto.battery,
+            water: dto.volume,
           });
         });
       }),
     );
   }
 
-  async create(name: string): Promise<Device> {
-    return await this.deviceRepository.save({ name });
+  async create(dto: CreateDeviceDTO): Promise<Device> {
+    const deviceAlreadyExists = await this.findByMac(dto.mac);
+
+    if (deviceAlreadyExists) {
+      throw new ConflictException('Device already exists');
+    }
+
+    return await this.deviceRepository.save({ ...dto });
   }
 
-  async findOne(id: string): Promise<Device> {
-    return await this.deviceRepository.findOne({ where: { id } });
-  }
-
-  async findAllWithHistory() {
-    const devices = await this.deviceRepository.find({
-      relations: ['devicesHistory'],
-    });
-
-    return devices.map((device) => {
-      return {
-        ...device,
-        volume:
-          device?.devicesHistory[device?.devicesHistory?.length - 1]?.volume ||
-          0,
-        totalVolume: device.maxCapacity,
-        percentage:
-          device?.devicesHistory[device?.devicesHistory?.length - 1]
-            ?.percentage || 0,
-      };
-    });
-  }
-
-  async findByName(name: string): Promise<Device> {
-    return await this.deviceRepository.findOne({
-      where: { name },
-    });
+  async findByMac(mac: string): Promise<Device> {
+    return await this.deviceRepository.findOne({ where: { mac } });
   }
 
   findAll(): Promise<Device[]> {
-    return this.deviceRepository.find();
+    return this.deviceRepository.find({ relations: ['devicesHistory'] });
+  }
+
+  findOne(id: string): Promise<Device> {
+    return this.deviceRepository.findOne({
+      where: { id },
+      relations: ['devicesHistory'],
+    });
   }
 }

@@ -1,5 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { DeviceHistory } from './deviceHistory.entity';
+import { DeviceHistory } from './device-history.entity';
 
 @Entity()
 export class Device {
@@ -12,11 +12,17 @@ export class Device {
   @Column()
   name: string;
 
-  @Column()
-  topic: string;
+  @Column({ default: 0 })
+  battery: number;
 
-  @Column()
-  maxCapacity: number;
+  @Column({ default: 0 })
+  water: number;
+
+  @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })
+  percentage: number;
+
+  @Column({ default: 0 })
+  maxWater: number;
 
   @OneToMany(() => DeviceHistory, (devicesHistory) => devicesHistory.device)
   devicesHistory: DeviceHistory[];

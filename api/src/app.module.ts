@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Device } from './device/entity/device.entity';
 import { DeviceModule } from './device/device.module';
 import { MqttModule } from './mqtt/mqtt.module';
-import { DeviceHistory } from './device/entity/deviceHistory.entity';
+import { DeviceHistory } from './device/entity/device-history.entity';
 
 @Module({
   imports: [

@@ -1,91 +1,56 @@
-import {
-  Center,
-  Flex,
-  Group,
-  Loader,
-  Progress,
-  Text,
-  Title,
-} from '@mantine/core';
-import { useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
-import { DeviceCard } from '../DeviceCard/DeviceCard';
-import { SelectedDevice } from '../SelectedDevice/SelectedDevice';
+import { Divider, Flex, Grid, Group, Stack, Text, Title } from '@mantine/core';
+import { useContext, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { AppContext } from '../../contexts/AppContext';
+import BatteryGauge from '../Battery/Battery';
+import LiquidGauge from '../Liquid/Liquid';
 
 export const Dashboard = () => {
-  const [selectedDevice, setSelectedDevice] = useState<string | null>();
-  const [progress, setProgress] = useState<number>(0);
+  const { id } = useParams();
+  const context = useContext(AppContext);
 
   useEffect(() => {
-    let counter = 0;
-    const interval = setInterval(() => {
-      counter++;
-      setProgress((progress) => progress + 10);
-      if (counter === 10) {
-        counter = 0;
-        setProgress(0);
-      }
-    }, 1000);
-  }, []);
+    if (context.devices.length) {
+      const selected = context.devices.find((element) => element.id === id);
 
-  const { isLoading, data } = useQuery(
-    'devices',
-    () =>
-      fetch('http://localhost:3000/devices/history').then((res) => res.json()),
-    {
-      refetchInterval: 10 * 1000,
+      if (selected) context.setSelectedDevice(selected);
     }
-  );
-
-  const handleSelectDevice = (mac: string) => {
-    setSelectedDevice(mac);
-  };
+  }, [id, context.devices]);
 
   return (
     <Flex
       mih={50}
       gap="md"
-      justify="center"
       align="center"
       direction="column"
       wrap="wrap"
       style={{ height: '100%' }}
     >
-      <Text>Refetch Time</Text>
-      <Progress
-        value={progress}
-        mt="md"
-        size="lg"
-        radius="xl"
-        style={{ width: '100%' }}
-      />
-      <Group position="center" style={{ height: 300 }}>
-        {isLoading && <Loader />}
-        {data &&
-          data.map((device: any) => (
-            <DeviceCard
-              key={device.mac}
-              active={selectedDevice === device.mac}
-              name={device.name}
-              action={() => handleSelectDevice(device.mac)}
-            />
-          ))}
-      </Group>
-      <Center style={{ flex: 1 }}>
-        {selectedDevice && data ? (
-          <SelectedDevice
-            volume={data.find((el: any) => el.mac === selectedDevice).volume}
-            totalVolume={
-              data.find((el: any) => el.mac === selectedDevice).totalVolume
-            }
-            percentage={
-              data.find((el: any) => el.mac === selectedDevice).percentage
-            }
-          />
-        ) : (
-          <Title>Selecione um dispositivo</Title>
-        )}
-      </Center>
+      <Title order={3}>Selected Device - {context.selectedDevice?.name}</Title>
+      <Divider size="sm" style={{ width: '100%' }} />
+      <Grid justify="space-between" style={{ width: '100%' }}>
+        <Grid.Col span={6}>
+          <Stack align="center">
+            <Title>Current Consumption</Title>
+            <Group spacing="4rem">
+              <Stack align="center">
+                <Title order={4}>Water</Title>
+                <LiquidGauge value={context.selectedDevice?.percentage} />
+              </Stack>
+              <Stack align="center">
+                <Title order={4}>Battery</Title>
+                <BatteryGauge value={context.selectedDevice?.battery} />
+              </Stack>
+            </Group>
+          </Stack>
+        </Grid.Col>
+        <Grid.Col span={6}>
+          <Stack align="center">
+            <Title>History Consumption</Title>
+            <Text>TODO feature</Text>
+          </Stack>
+        </Grid.Col>
+      </Grid>
     </Flex>
   );
 };

@@ -1,54 +1,71 @@
-import { ActionIcon, Card, Stack, Title, rem } from '@mantine/core';
-import { GiWaterTower } from 'react-icons/gi';
+import { Group, Image, Paper, Text } from '@mantine/core';
+
+import { Link, useParams } from 'react-router-dom';
+import img from '../../assets/casa.png';
+import { useContext } from 'react';
+import { AppContext } from '../../contexts/AppContext';
 
 interface DeviceCardProps {
-  active: boolean;
+  uuid: string;
   name: string;
-  action: () => void;
+  battery: number;
 }
 
-export const DeviceCard = ({ active, name, action }: DeviceCardProps) => {
+export const DeviceCard = ({ battery, uuid, name }: DeviceCardProps) => {
+  const context = useContext(AppContext);
+
+  const active = context.selectedDevice?.id === uuid;
+
   return (
-    <Card
-      shadow="lg"
-      p="xl"
-      radius="md"
-      onClick={action}
+    <Paper
+      component={Link}
+      to={'/things/'.concat(uuid)}
+      onClick={() => {
+        const device = context.devices.find((device) => device.id === uuid);
+        if (device) context.setSelectedDevice(device);
+      }}
       sx={(theme) => ({
-        width: rem(150),
-        height: rem(150),
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundColor: active ? theme.colors.blue[5] : theme.colors.blue[2],
-        ':hover': {
-          border: '1px solid',
-          borderColor: theme.colors.blue[5],
+        display: 'grid',
+        justifyContent: 'center',
+        textAlign: 'center',
+        margin: '2px',
+        alignItems: 'center',
+        backgroundColor: 'white',
+        wordBreak: 'break-word',
+        padding: '20px',
+        color: active ? 'white' : '#1A2F48',
+        background: active ? '#1A2F48' : theme.white,
+        transition: '.5s',
+        borderRadius: '8px',
+        position: 'relative',
+        mb: '10px',
+        border: '.5px solid #1A2F48',
+        '&:hover': {
+          backgroundColor: active ? '#1A2F48' : '#4f6f80',
+          borderColor: '#1A2F48',
           cursor: 'pointer',
+          color: 'white',
         },
       })}
     >
-      <Stack align="center" style={{ width: '100%' }} spacing="xs">
-        <ActionIcon size={64} color={'white'} variant="transparent">
-          <GiWaterTower size={50} color="white" />
-        </ActionIcon>
-        <Title
-          order={3}
-          sx={(theme) => ({
-            fontFamily: `Greycliff CF, ${theme.fontFamily}`,
-            fontWeight: 900,
-            color: theme.white,
-            lineHeight: 1.2,
-            fontSize: rem(20),
-            marginTop: theme.spacing.xs,
-          })}
+      <Image maw={40} mx="auto" radius="md" src={img} alt="Random image" />
+      <Group spacing="xs" position="center">
+        <Text>Device</Text>-<Text>{name}</Text>
+      </Group>
+      <Group spacing="xs" position="center">
+        <Text>Battery</Text>-
+        <Paper
+          radius="lg"
+          pr="sm"
+          pl="sm"
+          style={{
+            backgroundColor: active ? 'white' : '#1A2F48',
+            color: active ? '#1A2F48' : 'white',
+          }}
         >
-          {name}
-        </Title>
-      </Stack>
-    </Card>
+          {battery}%
+        </Paper>
+      </Group>
+    </Paper>
   );
 };
