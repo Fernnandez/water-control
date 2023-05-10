@@ -16,14 +16,6 @@ function useDevice() {
       throw new Error(err);
     }
   }
-  // async function destroyThing(id: string) {
-  //   try {
-  //     const response = await api.delete(`/devices/${id}`);
-  //     if (response) return response.data;
-  //   } catch (err: any) {
-  //     throw new Error(err);
-  //   }
-  // }
   return {
     createDevice,
     getAll,

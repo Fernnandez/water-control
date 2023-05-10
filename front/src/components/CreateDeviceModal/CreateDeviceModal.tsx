@@ -7,6 +7,7 @@ import {
   TextInput,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import useDevice from '../../services/useDevice';
 
 interface CreateDeviceModalProps {
   opened: boolean;
@@ -17,6 +18,8 @@ export const CreateDeviceModal = ({
   opened,
   onClose,
 }: CreateDeviceModalProps) => {
+  const { createDevice } = useDevice();
+
   const form = useForm({
     initialValues: {
       name: '',
@@ -25,6 +28,24 @@ export const CreateDeviceModal = ({
     },
     validate: {},
   });
+
+  const handleSubmit = (data: {
+    name: string;
+    mac: string;
+    maxCapacity: number;
+  }) => {
+    createDevice({
+      name: data.name,
+      mac: data.mac,
+      maxCapacity: data.maxCapacity,
+    })
+      .then(() => {
+        onClose();
+      })
+      .catch((error: any) => {
+        throw new Error(error.message || "Couldn't create device");
+      });
+  };
 
   return (
     <Modal
@@ -35,7 +56,7 @@ export const CreateDeviceModal = ({
       padding="xl"
       size="md"
     >
-      <form onSubmit={form.onSubmit((values) => console.log(values))}>
+      <form onSubmit={form.onSubmit((values) => handleSubmit({ ...values }))}>
         <Grid grow gutter="xl" mt=".5rem">
           <Grid.Col span={6}>
             <TextInput
@@ -52,8 +73,8 @@ export const CreateDeviceModal = ({
               label="Max Capacity"
               hideControls
               min={0}
-              precision={2}
-              decimalSeparator=","
+              precision={0}
+              // decimalSeparator=","
               {...form.getInputProps('maxCapacity')}
             />
           </Grid.Col>
