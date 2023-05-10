@@ -1,6 +1,7 @@
 import {
   AppShell,
   Box,
+  Button,
   Center,
   Header,
   Navbar,
@@ -14,6 +15,7 @@ import { useQuery } from 'react-query';
 import { AppContext, IDevice } from '../../contexts/AppContext';
 import useDevice from '../../services/useDevice';
 import { DeviceCard } from '../DeviceCard/DeviceCard';
+import { CreateDeviceModal } from '../CreateDeviceModal/CreateDeviceModal';
 
 interface NavigationProps {
   children?: React.ReactNode;
@@ -31,6 +33,10 @@ export const Navigation = ({ children }: NavigationProps) => {
 
   const [progress, setProgress] = useState(0);
 
+  const [open, setOpen] = useState(false);
+
+  const handleClose = () => setOpen(false);
+
   useEffect(() => {
     const timer = setInterval(() => {
       if (progress < 100) {
@@ -43,11 +49,6 @@ export const Navigation = ({ children }: NavigationProps) => {
     return () => {
       clearInterval(timer);
     };
-  }, [progress]);
-
-  useEffect(() => {
-    console.log('alou');
-    console.log(progress);
   }, [progress]);
 
   return (
@@ -65,6 +66,7 @@ export const Navigation = ({ children }: NavigationProps) => {
         >
           <Navbar.Section>
             <Stack>
+              <Button onClick={() => setOpen(true)}>New Device</Button>
               {devicesQuery.isLoading && <Text>Carregando...</Text>}
               {devicesQuery.data &&
                 devicesQuery.data.length > 0 &&
@@ -93,6 +95,7 @@ export const Navigation = ({ children }: NavigationProps) => {
       }
     >
       {children}
+      <CreateDeviceModal onClose={handleClose} opened={open} />
     </AppShell>
   );
 };
