@@ -8,6 +8,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import useDevice from '../../services/useDevice';
+import { notifications } from '@mantine/notifications';
 
 interface CreateDeviceModalProps {
   opened: boolean;
@@ -29,6 +30,26 @@ export const CreateDeviceModal = ({
     validate: {},
   });
 
+  const formatMacAddress = (input: string) => {
+    const cleanedInput = input.replace(/[^A-Fa-f0-9]/g, ''); // Remove caracteres não permitidos
+    let formattedMac = '';
+
+    for (let i = 0; i < cleanedInput.length; i++) {
+      if (i > 0 && i % 2 === 0 && formattedMac.length < 16) {
+        formattedMac += ':';
+      }
+      formattedMac += cleanedInput[i];
+    }
+
+    return formattedMac;
+  };
+
+  const handleChangeMacAddress = (event: any) => {
+    const input = event.target.value;
+    const formattedMac = formatMacAddress(input);
+    form.setFieldValue('mac', formattedMac);
+  };
+
   const handleSubmit = (data: {
     name: string;
     mac: string;
@@ -40,10 +61,20 @@ export const CreateDeviceModal = ({
       maxCapacity: data.maxCapacity,
     })
       .then(() => {
+        notifications.show({
+          color: 'green',
+          title: 'Success',
+          message: 'New device registered',
+        });
         onClose();
       })
       .catch((error: any) => {
-        throw new Error(error.message || "Couldn't create device");
+        console.log({ error });
+        notifications.show({
+          color: 'red',
+          title: 'Error',
+          message: error.message,
+        });
       });
   };
 
@@ -65,9 +96,11 @@ export const CreateDeviceModal = ({
               {...form.getInputProps('name')}
             />
             <TextInput
+              maxLength={17}
+              value={form.values.mac}
+              onChange={handleChangeMacAddress}
               label="Mac Address"
               placeholder="Mac Address"
-              {...form.getInputProps('mac')}
             />
             <NumberInput
               label="Max Capacity"
