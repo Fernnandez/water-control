@@ -8,6 +8,9 @@ export interface IDevice {
   water: number;
   percentage: number;
   maxWater: number;
+  history: any[];
+  minDate: Date;
+  maxDate: Date;
 }
 export type AppProviderType = {
   devices: IDevice[];

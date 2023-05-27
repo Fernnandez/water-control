@@ -52,20 +52,6 @@ export const DeviceCard = ({ battery, uuid, name }: DeviceCardProps) => {
       <Group spacing="xs" position="center">
         <Text>Device</Text>-<Text>{name}</Text>
       </Group>
-      <Group spacing="xs" position="center">
-        <Text>Battery</Text>-
-        <Paper
-          radius="lg"
-          pr="sm"
-          pl="sm"
-          style={{
-            backgroundColor: active ? 'white' : '#1A2F48',
-            color: active ? '#1A2F48' : 'white',
-          }}
-        >
-          {battery}%
-        </Paper>
-      </Group>
     </Paper>
   );
 };
