@@ -1,4 +1,4 @@
-import { Group, Image, Paper, Text } from '@mantine/core';
+import { Divider, Group, Image, Paper, Text } from '@mantine/core';
 
 import { Link, useParams } from 'react-router-dom';
 import img from '../../assets/casa.png';
@@ -8,10 +8,9 @@ import { AppContext } from '../../contexts/AppContext';
 interface DeviceCardProps {
   uuid: string;
   name: string;
-  battery: number;
 }
 
-export const DeviceCard = ({ battery, uuid, name }: DeviceCardProps) => {
+export const DeviceCard = ({ uuid, name }: DeviceCardProps) => {
   const context = useContext(AppContext);
 
   const active = context.selectedDevice?.id === uuid;
@@ -49,9 +48,8 @@ export const DeviceCard = ({ battery, uuid, name }: DeviceCardProps) => {
       })}
     >
       <Image maw={40} mx="auto" radius="md" src={img} alt="Random image" />
-      <Group spacing="xs" position="center">
-        <Text>Device</Text>-<Text>{name}</Text>
-      </Group>
+      <Divider my="xs" size="md" />
+      <Text>{name}</Text>
     </Paper>
   );
 };

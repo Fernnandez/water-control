@@ -67,7 +67,7 @@ export const Navigation = ({ children }: NavigationProps) => {
     <AppShell
       navbar={
         <Navbar
-          width={{ base: 250 }}
+          width={{ base: 200 }}
           height={'100vh'}
           sx={{
             margin: '10px',
@@ -83,7 +83,6 @@ export const Navigation = ({ children }: NavigationProps) => {
                 devicesQuery.data.map((device: IDevice) => {
                   return (
                     <DeviceCard
-                      battery={device.battery}
                       uuid={device.id}
                       name={device.name}
                       key={device.id}
