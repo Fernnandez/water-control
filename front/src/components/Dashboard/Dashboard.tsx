@@ -112,7 +112,8 @@ export const Dashboard = () => {
           </Group>
           <Divider mt="md" mb="md" />
           <HistoryChart
-            data={filterData(date, context.selectedDevice?.history)}
+            data={filterData(date, context.selectedDevice?.aggregatedHistory)}
+            maxCapacity={context.selectedDevice?.maxCapacity}
           />
         </Paper>
       </Flex>

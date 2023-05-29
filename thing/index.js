@@ -1,72 +1,5 @@
-// import mqtt from 'mqtt';
-// import { devices } from './devices';
-
-// const client = mqtt.connect('mqtt://localhost:1883');
-
-// let count = 1;
-// let timestamp = 3600000;
-
-// client.on('connect', () => {
-//   console.log('conectado ao broker');
-//   setInterval(() => {
-//     const message = {
-//       volume: count * 100,
-//       percentage: count * 10,
-//       timestamp: Date.now() + timestamp,
-//     };
-//     client.publish('127.123.0.1-casa', JSON.stringify(message));
-//     count++;
-//     timestamp += 3600000;
-//   }, 10 * 1000);
-// });
-
-// client.on('error', (error) => {
-//   console.log(error);
-// });
-
-// import mqtt from 'mqtt';
-// import { devices } from './devices.js';
-
-// const client = mqtt.connect('mqtt://localhost:1883');
-
-// client.on('connect', () => {
-//   console.log('Conectado ao broker MQTT');
-//   const volumeMap = {}; // Armazena o último valor de volume para cada dispositivo
-//   setInterval(() => {
-//     devices.forEach((device) => {
-//       console.log(device);
-//       // Simulação da alteração do volume do reservatório
-//       const previousVolume = volumeMap[device.mac] ?? device.volumeTotal; // valor anterior ou valor total
-//       const diff = Math.floor(Math.random() * 21) - 10; // gera número aleatório entre -10 e 10
-//       const currentVolume = Math.max(
-//         0,
-//         Math.min(device.volumeTotal, previousVolume + diff)
-//       ); // limita o valor dentro do intervalo [0, volumeTotal]
-//       const percentage = Math.floor((currentVolume / device.volumeTotal) * 100);
-
-//       // Criação da mensagem MQTT
-//       const message = {
-//         volume: currentVolume,
-//         percentage,
-//         timestamp: Date.now(),
-//       };
-
-//       // Publicação da mensagem MQTT no tópico do dispositivo
-//       // const topic = `devices/${device.macAddress}`;
-//       client.publish(device.mac, JSON.stringify(message));
-
-//       // Armazenamento do valor atual para uso no próximo intervalo
-//       volumeMap[device.mac] = currentVolume;
-//       timestamp += 3600000;
-//     });
-//   }, 10 * 1000);
-// });
-
-// client.on('error', (error) => {
-//   console.log(`Erro na conexão MQTT: ${error}`);
-// });
-
 import mqtt from 'mqtt';
+import { DateTime } from 'luxon';
 import { devices } from './devices.js';
 
 const client = mqtt.connect('mqtt://localhost:1883');
@@ -74,13 +7,21 @@ const client = mqtt.connect('mqtt://localhost:1883');
 client.on('connect', () => {
   console.log('Conectado ao broker MQTT');
   const deviceMap = {}; // Armazena o último valor de volume e bateria para cada dispositivo
-  let timestamp = 3600000;
-  setInterval(() => {
+  let timestamp = DateTime.fromISO('2023-01-01').toMillis(); // Definindo o timestamp inicial para janeiro de 2023
+  const now = DateTime.now().toMillis(); // Obtendo o timestamp atual
+
+  const intervalId = setInterval(() => {
+    if (timestamp > now) {
+      // Verifica se o timestamp atual ultrapassou o timestamp atual
+      clearInterval(intervalId); // Interrompe a execução do setInterval
+      return;
+    }
+
     devices.forEach((device) => {
       // Simulação da alteração do volume do reservatório
       const previousVolume =
         deviceMap[device.macAddress]?.volume ?? device.volumeTotal; // valor anterior ou valor total
-      const diff = Math.floor(Math.random() * 31) - 25; // gera número aleatório entre -10 e 10
+      const diff = Math.floor(Math.random() * 310) - 250; // gera número aleatório entre -10 e 10
       const currentVolume = Math.max(
         0,
         Math.min(device.volumeTotal, previousVolume + diff)
@@ -101,11 +42,9 @@ client.on('connect', () => {
           volume: currentVolume,
           percentage,
           battery: currentBattery,
-          timestamp: Date.now() + timestamp,
+          timestamp,
         };
 
-        // Publicação da mensagem MQTT no tópico do dispositivo
-        // const topic = `devices/${device.macAddress}`;
         console.log(message);
         client.publish(device.macAddress, JSON.stringify(message));
       }
@@ -115,11 +54,8 @@ client.on('connect', () => {
         volume: currentVolume,
         battery: currentBattery,
       };
-      timestamp += 3600000;
+      const day = 3600000 * 24;
+      timestamp += day;
     });
-  }, 60 * 1000);
-});
-
-client.on('error', (error) => {
-  console.log(`Erro na conexão MQTT: ${error}`);
+  }, 0.5 * 1000);
 });

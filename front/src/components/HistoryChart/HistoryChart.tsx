@@ -1,18 +1,70 @@
-import { Box } from '@mantine/core';
+import { Box, Paper, Space, Text } from '@mantine/core';
 import {
+  Area,
+  AreaChart,
   CartesianGrid,
   Legend,
-  Line,
-  LineChart,
+  ReferenceLine,
   Tooltip,
   XAxis,
   YAxis,
 } from 'recharts';
+import { AggregatedDeviceHistory } from '../../contexts/AppContext';
 
-export const HistoryChart = ({ data }: { data: any | undefined }) => {
+const toPercent = (decimal: number, fixed = 0) =>
+  `${(decimal * 100).toFixed(fixed)}%`;
+
+const getPercent = (value: number, total: number) => {
+  const ratio = total > 0 ? value / total : 0;
+
+  return toPercent(ratio, 2);
+};
+
+export const HistoryChart = ({
+  data,
+  maxCapacity,
+}: {
+  data: AggregatedDeviceHistory[];
+  maxCapacity: number;
+}) => {
+  const batteryTooltip = (o: any) => {
+    const { payload, label } = o;
+
+    return (
+      <Paper shadow="lg" p="sm" className="customized-tooltip-content">
+        {payload.map((entry: any, index: any) => (
+          <Text key={`item-${index}`} style={{ color: entry.color }}>
+            {`${entry.name}: ${getPercent(entry.value, 100)}`}
+          </Text>
+        ))}
+        <Space h="sm" />
+        <Text c="dimmed">date: {label}</Text>
+      </Paper>
+    );
+  };
+
+  const volumeTooltip = (o: any) => {
+    const { payload, label } = o;
+
+    return (
+      <Paper shadow="lg" p="sm" className="customized-tooltip-content">
+        {payload.map((entry: any, index: any) => (
+          <Text key={`item-${index}`} style={{ color: entry.color }}>
+            {`${entry.name}: ${entry.value}L (${getPercent(
+              entry.value,
+              maxCapacity
+            )})`}
+          </Text>
+        ))}
+        <Space h="sm" />
+        <Text c="dimmed">date: {label}</Text>
+      </Paper>
+    );
+  };
+
   return (
     <Box>
-      <LineChart
+      <AreaChart
         width={1000}
         height={350}
         data={data}
@@ -24,19 +76,20 @@ export const HistoryChart = ({ data }: { data: any | undefined }) => {
         }}
       >
         <CartesianGrid strokeDasharray="3 3" />
+        <ReferenceLine y={maxCapacity} label="Max Capacity" stroke="blue" />
         <XAxis dataKey="date" />
         <YAxis />
-        <Tooltip />
+        <Tooltip content={volumeTooltip} />
         <Legend />
-        <Line
+        <Area
           type="monotone"
           dataKey="volume"
           stroke="#8884d8"
           activeDot={{ r: 8 }}
         />
-      </LineChart>
+      </AreaChart>
 
-      <LineChart
+      <AreaChart
         width={1000}
         height={350}
         data={data}
@@ -49,16 +102,18 @@ export const HistoryChart = ({ data }: { data: any | undefined }) => {
       >
         <CartesianGrid strokeDasharray="3 6" />
         <XAxis dataKey="date" />
+        <ReferenceLine y={100} stroke="green" />
         <YAxis />
-        <Tooltip />
+        <Tooltip content={batteryTooltip} />
         <Legend />
-        <Line
+        <Area
           type="monotone"
           dataKey="battery"
           stroke="#82ca9d"
+          fill="#82ca9d"
           activeDot={{ r: 8 }}
         />
-      </LineChart>
+      </AreaChart>
     </Box>
   );
 };
