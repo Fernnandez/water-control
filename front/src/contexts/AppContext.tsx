@@ -7,7 +7,7 @@ export interface IDevice {
   battery: number;
   water: number;
   percentage: number;
-  maxWater: number;
+  maxCapacity: number;
   history: any[];
   minDate: Date;
   maxDate: Date;

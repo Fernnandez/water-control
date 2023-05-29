@@ -17,21 +17,7 @@ export class DeviceService {
     // TODO - Subscribe to MQTT topic of each one devices
     this.findAll().then((res) =>
       res.forEach((device) => {
-        console.log(`Subscribing to ${device.mac}`);
-        this.mqttService.subscribe(device.mac, (msg) => {
-          const dto = JSON.parse(msg);
-          this.deviceHistoryService.create({
-            volume: dto.volume,
-            battery: dto.battery,
-            timestamp: new Date(dto.timestamp),
-            device,
-          });
-          this.deviceRepository.update(device.id, {
-            percentage: Number(dto.percentage),
-            battery: dto.battery,
-            water: dto.volume,
-          });
-        });
+        this.subscribe(device);
       }),
     );
   }
@@ -43,7 +29,11 @@ export class DeviceService {
       throw new ConflictException('Device already exists');
     }
 
-    return await this.deviceRepository.save({ ...dto });
+    const newDevice = await this.deviceRepository.save({ ...dto });
+
+    this.subscribe(newDevice);
+
+    return newDevice;
   }
 
   async findByMac(mac: string): Promise<Device> {
@@ -58,6 +48,24 @@ export class DeviceService {
     return this.deviceRepository.findOne({
       where: { id },
       relations: ['devicesHistory'],
+    });
+  }
+
+  subscribe(device: Device): void {
+    console.log(`Subscribing to ${device.mac}`);
+    this.mqttService.subscribe(device.mac, (msg) => {
+      const dto = JSON.parse(msg);
+      this.deviceHistoryService.create({
+        volume: dto.volume,
+        battery: dto.battery,
+        timestamp: new Date(dto.timestamp),
+        device,
+      });
+      this.deviceRepository.update(device.id, {
+        percentage: Number(dto.percentage),
+        battery: dto.battery,
+        water: dto.volume,
+      });
     });
   }
 }

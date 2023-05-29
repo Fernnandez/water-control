@@ -22,7 +22,7 @@ export class Device {
   percentage: number;
 
   @Column({ default: 0 })
-  maxWater: number;
+  maxCapacity: number;
 
   @OneToMany(() => DeviceHistory, (devicesHistory) => devicesHistory.device)
   devicesHistory: DeviceHistory[];

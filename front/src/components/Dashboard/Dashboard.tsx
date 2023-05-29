@@ -82,7 +82,7 @@ export const Dashboard = () => {
             <Group>
               <Title order={4}>Max Capacity:</Title>
               <Text size="lg" color="dimmend">
-                {context.selectedDevice?.maxWater} L
+                {context.selectedDevice?.maxCapacity} L
               </Text>
             </Group>
             <Group>

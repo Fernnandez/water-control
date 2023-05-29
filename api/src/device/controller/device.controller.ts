@@ -5,7 +5,7 @@ import { DeviceService } from '../service/device.service';
 export class CreateDeviceDTO {
   name: string;
   mac: string;
-  maxWater: number;
+  maxCapacity: number;
 }
 
 @Controller('devices')
