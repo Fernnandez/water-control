@@ -5,8 +5,8 @@ function BatteryGauge({ value = 0 }) {
     <Box
       style={{
         border: '10px solid green',
-        width: 150,
-        height: 300,
+        width: 100,
+        height: 150,
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -24,7 +24,7 @@ function BatteryGauge({ value = 0 }) {
           alignItems: 'center',
         }}
       >
-        <Text fz={50}>{value}%</Text>
+        <Text fz={30}>{value}%</Text>
       </Box>
     </Box>
   );

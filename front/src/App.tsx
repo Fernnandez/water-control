@@ -1,9 +1,9 @@
-import { Title } from '@mantine/core';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Dashboard } from './components/Dashboard/Dashboard';
 import { Navigation } from './components/Navigation/Navigation';
 import { AppProvider } from './contexts/AppContext';
+import { Home } from './components/Home/Home';
 
 function App() {
   const queryClient = new QueryClient();
@@ -14,10 +14,7 @@ function App() {
         <BrowserRouter>
           <Navigation>
             <Routes>
-              <Route
-                path="/"
-                element={<Title>Selecione um dispositivo</Title>}
-              />
+              <Route path="/" element={<Home />} />
               <Route path="things/:id" element={<Dashboard />} />
             </Routes>
           </Navigation>

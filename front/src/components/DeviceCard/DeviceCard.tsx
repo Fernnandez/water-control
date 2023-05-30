@@ -1,8 +1,8 @@
-import { Divider, Group, Image, Paper, Text } from '@mantine/core';
+import { Divider, Image, Paper, Text } from '@mantine/core';
 
-import { Link, useParams } from 'react-router-dom';
-import img from '../../assets/casa.png';
 import { useContext } from 'react';
+import { Link } from 'react-router-dom';
+import img from '../../assets/casa.png';
 import { AppContext } from '../../contexts/AppContext';
 
 interface DeviceCardProps {

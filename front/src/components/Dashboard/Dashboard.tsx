@@ -1,12 +1,25 @@
-import { Divider, Flex, Group, Paper, Stack, Text, Title } from '@mantine/core';
+import {
+  ActionIcon,
+  Divider,
+  Flex,
+  Group,
+  Menu,
+  Paper,
+  Stack,
+  Text,
+  Title,
+  rem,
+} from '@mantine/core';
 import { MonthPickerInput } from '@mantine/dates';
+import { DateTime } from 'luxon';
 import { useContext, useEffect, useState } from 'react';
+import { BsThreeDotsVertical, BsTrash } from 'react-icons/bs';
+import { MdEdit } from 'react-icons/md';
 import { useParams } from 'react-router-dom';
 import { AppContext } from '../../contexts/AppContext';
 import BatteryGauge from '../Battery/Battery';
 import { HistoryChart } from '../HistoryChart/HistoryChart';
 import LiquidGauge from '../Liquid/Liquid';
-import { DateTime } from 'luxon';
 
 const filterData = (date: Date, data: any) => {
   if (!data) return [];
@@ -36,20 +49,17 @@ export const Dashboard = () => {
 
   if (context.selectedDevice) {
     return (
-      <Flex
-        mih={50}
-        gap="md"
-        align="center"
-        direction="column"
-        wrap="wrap"
-        style={{ height: '100%' }}
-      >
+      <Flex mih={50} gap="md" align="center" direction="column" wrap="wrap">
         <Group
           mb="xl"
           position="center"
           style={{ width: '100%', gap: '10rem' }}
         >
-          <Paper shadow="xl" p="xl">
+          <Paper
+            shadow="xl"
+            p="xl"
+            style={{ minHeight: '300px', minWidth: '400px' }}
+          >
             <Title order={3}>Current Consumption</Title>
             <Divider mt="md" mb="md" />
             <Group spacing="4rem">
@@ -64,11 +74,33 @@ export const Dashboard = () => {
             </Group>
           </Paper>
 
-          <Paper shadow="xl" p="xl">
-            <Title order={3}>Device Information</Title>
+          <Paper
+            shadow="xl"
+            p="xl"
+            style={{ minHeight: '300px', minWidth: '400px' }}
+          >
+            <Group w={'100%'} position="apart">
+              <Title order={3}>Device Information</Title>
+              <Menu position="bottom-start" withArrow arrowSize={10}>
+                <Menu.Target>
+                  <ActionIcon
+                    variant="filled"
+                    style={{ backgroundColor: '#EF4B3B' }}
+                  >
+                    <BsThreeDotsVertical />
+                  </ActionIcon>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  <Menu.Item icon={<MdEdit size={rem(18)} />}>Editar</Menu.Item>
+                  <Menu.Item icon={<BsTrash size={rem(18)} />} color="red">
+                    Excluir
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+            </Group>
             <Divider mt="md" mb="md" />
             <Group>
-              <Title order={4}>Selected Device:</Title>
+              <Title order={4}>Device Name:</Title>
               <Text size="lg" color="dimmend">
                 {context.selectedDevice?.name}
               </Text>
@@ -80,9 +112,21 @@ export const Dashboard = () => {
               </Text>
             </Group>
             <Group>
-              <Title order={4}>Max Capacity:</Title>
+              <Title order={4}>Height:</Title>
               <Text size="lg" color="dimmend">
-                {context.selectedDevice?.maxCapacity} L
+                2M
+              </Text>
+            </Group>
+            <Group>
+              <Title order={4}>Base Radius:</Title>
+              <Text size="lg" color="dimmend">
+                1.26M
+              </Text>
+            </Group>
+            <Group>
+              <Title order={4}>Address:</Title>
+              <Text size="lg" color="dimmend">
+                Chico mendes 295, Igarassu, Pernambuco
               </Text>
             </Group>
             <Group>
@@ -118,5 +162,5 @@ export const Dashboard = () => {
         </Paper>
       </Flex>
     );
-  }
+  } else return <></>;
 };

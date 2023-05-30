@@ -11,18 +11,19 @@ import {
 import { DateTime } from 'luxon';
 import { useContext, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
+import { Link } from 'react-router-dom';
+import logo from '../../assets/logo-white.svg';
 import { AppContext, IDevice } from '../../contexts/AppContext';
 import useDevice from '../../services/useDevice';
 import { CreateDeviceModal } from '../CreateDeviceModal/CreateDeviceModal';
 import { DeviceCard } from '../DeviceCard/DeviceCard';
-import logo from '../../assets/logo-white.svg';
 
 interface NavigationProps {
   children?: React.ReactNode;
 }
 
 export const Navigation = ({ children }: NavigationProps) => {
-  const { setDevices } = useContext(AppContext);
+  const { setDevices, setSelectedDevice } = useContext(AppContext);
   const { getAll } = useDevice();
   const devicesQuery = useQuery(['allDevices'], getAll, {
     refetchInterval: 10 * 1000,
@@ -66,6 +67,7 @@ export const Navigation = ({ children }: NavigationProps) => {
 
   return (
     <AppShell
+      style={{ height: 'calc(100vh - 60px)', width: '100%' }}
       navbar={
         <Navbar
           width={{ base: 250 }}
@@ -101,9 +103,18 @@ export const Navigation = ({ children }: NavigationProps) => {
           <Flex
             justify="center"
             align="center"
-            style={{ width: '100%', height: '100%' }}
+            style={{ width: '100%', height: '100%', paddingLeft: 250 }}
           >
-            <Image width={180} radius="md" src={logo} />
+            <Link to="/">
+              <Image
+                width={180}
+                radius="md"
+                src={logo}
+                onClick={() => {
+                  setSelectedDevice(null);
+                }}
+              />
+            </Link>
           </Flex>
         </Header>
       }
