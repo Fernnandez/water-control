@@ -1,12 +1,12 @@
 import {
   AppShell,
   Button,
-  Center,
+  Flex,
   Header,
+  Image,
   Navbar,
   Stack,
   Text,
-  Title,
 } from '@mantine/core';
 import { DateTime } from 'luxon';
 import { useContext, useEffect, useState } from 'react';
@@ -15,6 +15,7 @@ import { AppContext, IDevice } from '../../contexts/AppContext';
 import useDevice from '../../services/useDevice';
 import { CreateDeviceModal } from '../CreateDeviceModal/CreateDeviceModal';
 import { DeviceCard } from '../DeviceCard/DeviceCard';
+import logo from '../../assets/logo-white.svg';
 
 interface NavigationProps {
   children?: React.ReactNode;
@@ -67,16 +68,18 @@ export const Navigation = ({ children }: NavigationProps) => {
     <AppShell
       navbar={
         <Navbar
-          width={{ base: 200 }}
+          width={{ base: 250 }}
           height={'100vh'}
           sx={{
-            margin: '10px',
-            paddingRight: '5px',
+            padding: '10px',
+            backgroundColor: '#EEF1FF',
           }}
         >
           <Navbar.Section>
             <Stack>
-              <Button onClick={() => setOpen(true)}>New Device</Button>
+              <Button bg="#1A2F48" onClick={() => setOpen(true)}>
+                New Device
+              </Button>
               {devicesQuery.isLoading && <Text>Carregando...</Text>}
               {devicesQuery.data &&
                 devicesQuery.data.length > 0 &&
@@ -94,12 +97,14 @@ export const Navigation = ({ children }: NavigationProps) => {
         </Navbar>
       }
       header={
-        <Header height={40} bg="blue">
-          <Center>
-            <Title order={2} color="white">
-              AQUAMON
-            </Title>
-          </Center>
+        <Header height={60} bg="#1A2F48">
+          <Flex
+            justify="center"
+            align="center"
+            style={{ width: '100%', height: '100%' }}
+          >
+            <Image width={180} radius="md" src={logo} />
+          </Flex>
         </Header>
       }
     >

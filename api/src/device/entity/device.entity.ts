@@ -15,7 +15,7 @@ export class Device {
   @Column({ default: 0 })
   battery: number;
 
-  @Column({ default: 0 })
+  @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })
   water: number;
 
   @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })
@@ -23,6 +23,14 @@ export class Device {
 
   @Column({ default: 0 })
   maxCapacity: number;
+
+  // Medidas em metros
+  @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })
+  height: number;
+
+  // Medidas em metros
+  @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })
+  baseRadius: number;
 
   @OneToMany(() => DeviceHistory, (devicesHistory) => devicesHistory.device)
   devicesHistory: DeviceHistory[];

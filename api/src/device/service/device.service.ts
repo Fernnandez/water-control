@@ -75,6 +75,16 @@ export class DeviceService {
     });
   }
 
+  calcCurrentVolume(distance: number, device: Device): number {
+    const { height, baseRadius } = device;
+
+    const currentHeight = height - distance / 100;
+
+    const currentVolume = Math.PI * Math.pow(baseRadius, 2) * currentHeight;
+
+    return Number((currentVolume * 1000).toFixed(2));
+  }
+
   mapDeviceToAggregatedHistory(device: Device): DeviceWithAggregatedHistory {
     const aggregatedHistory: AggregatedDeviceHistory[] = [];
 
@@ -111,16 +121,26 @@ export class DeviceService {
     console.log(`Subscribing to ${device.mac}`);
     this.mqttService.subscribe(device.mac, (msg) => {
       const dto = JSON.parse(msg);
+
+      const currentVolume = this.calcCurrentVolume(dto.distance, device);
+
+      const currentPercentage = (
+        (currentVolume * 100) /
+        device.maxCapacity
+      ).toFixed(2);
+
+      console.log(currentVolume, currentPercentage);
+
       this.deviceHistoryService.create({
-        volume: dto.volume,
+        volume: currentVolume,
         battery: dto.battery,
         timestamp: new Date(dto.timestamp),
         device,
       });
       this.deviceRepository.update(device.id, {
-        percentage: Number(dto.percentage),
+        percentage: Number(currentPercentage),
         battery: dto.battery,
-        water: dto.volume,
+        water: currentVolume,
       });
     });
   }

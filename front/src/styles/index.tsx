@@ -12,7 +12,7 @@ export function GlobalOverride() {
           },
 
           '::-webkit-scrollbar-thumb': {
-            background: theme.colors.blue[6],
+            background: '#1A2F48',
           },
 
           '::-webkit-scrollbar-track': {
