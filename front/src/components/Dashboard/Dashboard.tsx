@@ -1,5 +1,6 @@
 import {
   ActionIcon,
+  Affix,
   Divider,
   Flex,
   Grid,

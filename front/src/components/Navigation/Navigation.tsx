@@ -1,10 +1,12 @@
 import {
   AppShell,
   Button,
+  Center,
   Flex,
   Header,
   Image,
   Navbar,
+  RingProgress,
   Stack,
   Text,
 } from '@mantine/core';
@@ -55,11 +57,11 @@ export const Navigation = ({ children }: NavigationProps) => {
   useEffect(() => {
     const timer = setInterval(() => {
       if (progress < 100) {
-        setProgress((prevProgress) => prevProgress + 5);
+        setProgress((prevProgress) => prevProgress + 1);
       } else {
         setProgress(0);
       }
-    }, 500);
+    }, 100);
 
     return () => {
       clearInterval(timer);
@@ -72,13 +74,12 @@ export const Navigation = ({ children }: NavigationProps) => {
       navbar={
         <Navbar
           width={{ base: 250 }}
-          height={'100vh'}
           sx={{
             padding: '10px',
             backgroundColor: '#EEF1FF',
           }}
         >
-          <Navbar.Section>
+          <Navbar.Section grow mx="-xs" px="xs">
             <Stack>
               <Button
                 bg="#1A2F48"
@@ -103,6 +104,20 @@ export const Navigation = ({ children }: NavigationProps) => {
                   );
                 })}
             </Stack>
+          </Navbar.Section>
+
+          <Navbar.Section>
+            <Center>
+              <RingProgress
+                size={200}
+                label={
+                  <Text size="xs" align="center">
+                    Reloading Data
+                  </Text>
+                }
+                sections={[{ value: progress, color: '#1A2F48' }]}
+              />
+            </Center>
           </Navbar.Section>
         </Navbar>
       }
