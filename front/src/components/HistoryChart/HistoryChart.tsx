@@ -1,4 +1,4 @@
-import { Box, Paper, Space, Text } from '@mantine/core';
+import { Box, Paper, Space, Text, useMantineTheme } from '@mantine/core';
 import {
   Area,
   AreaChart,
@@ -27,12 +27,14 @@ export const HistoryChart = ({
   data: AggregatedDeviceHistory[];
   maxCapacity: number;
 }) => {
+  const theme = useMantineTheme();
+
   const batteryTooltip = (o: any) => {
     const { payload, label } = o;
 
     return (
       <Paper shadow="lg" p="sm" className="customized-tooltip-content">
-        {payload.map((entry: any, index: any) => (
+        {payload?.map((entry: any, index: any) => (
           <Text key={`item-${index}`} style={{ color: entry.color }}>
             {`${entry.name}: ${getPercent(entry.value, 100)}`}
           </Text>
@@ -48,7 +50,7 @@ export const HistoryChart = ({
 
     return (
       <Paper shadow="lg" p="sm" className="customized-tooltip-content">
-        {payload.map((entry: any, index: any) => (
+        {payload?.map((entry: any, index: any) => (
           <Text key={`item-${index}`} style={{ color: entry.color }}>
             {`${entry.name}: ${entry.value}L (${getPercent(
               entry.value,
@@ -76,7 +78,11 @@ export const HistoryChart = ({
         }}
       >
         <CartesianGrid strokeDasharray="3 3" />
-        <ReferenceLine y={maxCapacity} label="Max Capacity" stroke="blue" />
+        <ReferenceLine
+          y={maxCapacity}
+          label="Max Capacity"
+          stroke={theme.colors.blue[8]}
+        />
         <XAxis dataKey="date" />
         <YAxis />
         <Tooltip content={volumeTooltip} />
@@ -84,7 +90,8 @@ export const HistoryChart = ({
         <Area
           type="monotone"
           dataKey="volume"
-          stroke="#8884d8"
+          stroke={theme.colors.blue[8]}
+          fill={theme.colors.blue[8]}
           activeDot={{ r: 8 }}
         />
       </AreaChart>
@@ -102,15 +109,15 @@ export const HistoryChart = ({
       >
         <CartesianGrid strokeDasharray="3 6" />
         <XAxis dataKey="date" />
-        <ReferenceLine y={100} stroke="green" />
+        <ReferenceLine y={100} stroke={theme.colors.green[6]} />
         <YAxis />
         <Tooltip content={batteryTooltip} />
         <Legend />
         <Area
           type="monotone"
           dataKey="battery"
-          stroke="#82ca9d"
-          fill="#82ca9d"
+          stroke={theme.colors.green[6]}
+          fill={theme.colors.green[6]}
           activeDot={{ r: 8 }}
         />
       </AreaChart>

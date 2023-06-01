@@ -9,17 +9,20 @@ import {
   Text,
   Title,
   rem,
+  useMantineTheme,
 } from '@mantine/core';
 import { MonthPickerInput } from '@mantine/dates';
 import { DateTime } from 'luxon';
 import { useContext, useEffect, useState } from 'react';
 import { BsThreeDotsVertical, BsTrash } from 'react-icons/bs';
-import { MdEdit } from 'react-icons/md';
+import { MdEdit, MdOutlineWaterDrop } from 'react-icons/md';
+import { BiBattery } from 'react-icons/bi';
+
 import { useParams } from 'react-router-dom';
 import { AppContext } from '../../contexts/AppContext';
 import BatteryGauge from '../Battery/Battery';
 import { HistoryChart } from '../HistoryChart/HistoryChart';
-import LiquidGauge from '../Liquid/Liquid';
+import { LiquidGauge } from '../LiquidGauge/LiquidGaugue';
 
 const filterData = (date: Date, data: any) => {
   if (!data) return [];
@@ -35,6 +38,7 @@ const filterData = (date: Date, data: any) => {
 
 export const Dashboard = () => {
   const { id } = useParams();
+  const theme = useMantineTheme();
   const context = useContext(AppContext);
 
   const [date, setDate] = useState(DateTime.now().toJSDate());
@@ -43,7 +47,10 @@ export const Dashboard = () => {
     if (context.devices.length) {
       const selected = context.devices.find((element) => element.id === id);
 
-      if (selected) context.setSelectedDevice(selected);
+      if (selected) {
+        context.setSelectedDevice(selected);
+        setDate(selected.maxDate);
+      }
     }
   }, [id, context.devices]);
 
@@ -64,11 +71,17 @@ export const Dashboard = () => {
             <Divider mt="md" mb="md" />
             <Group spacing="4rem">
               <Stack align="center">
-                <Title order={4}>Water</Title>
+                <Group>
+                  <MdOutlineWaterDrop color={theme.colors.blue[8]} size={28} />
+                  <Title order={4}>Water</Title>
+                </Group>
                 <LiquidGauge value={context.selectedDevice?.percentage} />
               </Stack>
               <Stack align="center">
-                <Title order={4}>Battery</Title>
+                <Group>
+                  <BiBattery color={theme.colors.green[6]} size={28} />
+                  <Title order={4}>Battery</Title>
+                </Group>
                 <BatteryGauge value={context.selectedDevice?.battery} />
               </Stack>
             </Group>

@@ -1,12 +1,32 @@
-import { Box, Text } from '@mantine/core';
+export default BatteryGauge;
+
+import { Box, useMantineTheme } from '@mantine/core';
+import { useEffect, useState } from 'react';
 
 function BatteryGauge({ value = 0 }) {
+  const theme = useMantineTheme();
+  const [color, setColor] = useState(theme.colors.green[6]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setColor((prevColor) =>
+        prevColor === theme.colors.green[6]
+          ? theme.colors.green[9]
+          : theme.colors.green[6]
+      );
+    }, 1000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
+
   return (
     <Box
       style={{
-        border: '10px solid green',
+        border: '8px solid #1A2F48',
         width: 100,
-        height: 150,
+        height: 160,
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -14,20 +34,19 @@ function BatteryGauge({ value = 0 }) {
     >
       <Box
         style={{
-          width: '99%',
-          height: '99%',
-          background: `linear-gradient(to top, green, #ccc ${value}%, #fff ${value}%, #fff)`,
-          backgroundPosition: '0% 50%',
-          backgroundSize: '100%',
+          width: '96%',
+          height: '96%',
+          background: `linear-gradient(to top, ${color}, ${theme.colors.green[6]} ${value}%, #fff ${value}%, #fff)`,
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
         }}
       >
-        <Text fz={30}>{value}%</Text>
+        <span>
+          <span style={{ fontSize: '38px', color: '#1A2F48' }}>{value}</span>
+          <span style={{ fontSize: `${38 * 0.6}px`, color: '#1A2F48' }}>%</span>
+        </span>
       </Box>
     </Box>
   );
 }
-
-export default BatteryGauge;
