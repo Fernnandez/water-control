@@ -10,29 +10,54 @@ import {
   Title,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import useDevice from '../../services/useDevice';
 import { notifications } from '@mantine/notifications';
+import { useEffect, useState } from 'react';
 import img from '../../assets/casa.png';
+import { IDevice } from '../../contexts/AppContext';
+import useDevice from '../../services/useDevice';
 
-interface CreateDeviceModalProps {
+interface EditDeviceModalProps {
   opened: boolean;
+  device?: any;
   onClose: () => void;
 }
 
-export const CreateDeviceModal = ({
+export const EditDeviceModal = ({
   opened,
+  device,
   onClose,
-}: CreateDeviceModalProps) => {
+}: EditDeviceModalProps) => {
   const { createDevice } = useDevice();
+
+  useEffect(() => {
+    handleFormValues(device);
+  }, [device]);
 
   const form = useForm({
     initialValues: {
       name: '',
       mac: '',
-      maxCapacity: 0,
+      maxCapacity: '',
+      height: 0,
+      baseRadius: 0,
+      adrress: '',
     },
     validate: {},
   });
+
+  const handleClose = () => {
+    onClose();
+  };
+
+  const handleFormValues = (device: IDevice) => {
+    form.setValues({
+      name: device.name,
+      mac: device.mac,
+      maxCapacity: device.maxCapacity,
+      baseRadius: Number(device.baseRadius),
+      height: Number(device.height),
+    });
+  };
 
   const formatMacAddress = (input: string) => {
     const cleanedInput = input.replace(/[^A-Fa-f0-9]/g, '');
@@ -54,6 +79,7 @@ export const CreateDeviceModal = ({
     form.setFieldValue('mac', formattedMac);
   };
 
+  // TODO implementar edit device no backend
   const handleSubmit = (data: {
     name: string;
     mac: string;
@@ -68,7 +94,7 @@ export const CreateDeviceModal = ({
         notifications.show({
           color: 'green',
           title: 'Success',
-          message: 'New device registered',
+          message: 'Changes saved',
         });
         onClose();
       })
@@ -85,12 +111,12 @@ export const CreateDeviceModal = ({
   return (
     <Modal
       opened={opened}
-      onClose={onClose}
+      onClose={handleClose}
       title={
         <Group>
           <Image maw={30} mx="auto" radius="md" src={img} alt="Random image" />
           <Title order={3} color="#1A2F48">
-            New Device
+            Edit Device
           </Title>
         </Group>
       }
@@ -98,7 +124,7 @@ export const CreateDeviceModal = ({
       padding="xl"
       size="md"
     >
-      <form onSubmit={form.onSubmit((values) => handleSubmit({ ...values }))}>
+      <form onSubmit={form.onSubmit((values) => console.log({ ...values }))}>
         <Grid grow gutter="xl" mt=".5rem">
           <Grid.Col span={6}>
             <TextInput
@@ -114,8 +140,8 @@ export const CreateDeviceModal = ({
               value={form.values.mac}
               onChange={handleChangeMacAddress}
               label="Mac Address"
-              placeholder="00:00:00:00:00:00
-              "
+              disabled
+              placeholder="00:00:00:00:00:00"
               required
             />
           </Grid.Col>
@@ -123,11 +149,9 @@ export const CreateDeviceModal = ({
             <TextInput
               label="Reservatory Address"
               placeholder="street and number - city - state"
-              // hideControls
               min={0}
-              // precision={0}
               required
-              // {...form.getInputProps('maxCapacity')}
+              {...form.getInputProps('address')}
             />
           </Grid.Col>
         </Grid>
@@ -141,21 +165,24 @@ export const CreateDeviceModal = ({
               hideControls
               min={0}
               precision={2}
+              disabled
               required
-              {...form.getInputProps('maxCapacity')}
+              {...form.getInputProps('height')}
             />
             <NumberInput
               label="Base Radius (M)"
               hideControls
               min={0}
+              disabled
               precision={2}
               required
-              {...form.getInputProps('maxCapacity')}
+              {...form.getInputProps('baseRadius')}
             />
             <NumberInput
               label="Max Capacity (L)"
               hideControls
               min={0}
+              disabled
               precision={2}
               required
               {...form.getInputProps('maxCapacity')}
@@ -166,7 +193,7 @@ export const CreateDeviceModal = ({
         <Group position="apart">
           <Button
             compact
-            onClick={() => onClose()}
+            onClick={() => handleClose()}
             color="red"
             size="md"
             variant="outline"

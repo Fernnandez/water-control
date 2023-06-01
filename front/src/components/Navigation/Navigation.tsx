@@ -10,6 +10,7 @@ import {
 } from '@mantine/core';
 import { DateTime } from 'luxon';
 import { useContext, useEffect, useState } from 'react';
+import { FiPlus } from 'react-icons/fi';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/logo-white.svg';
@@ -79,8 +80,15 @@ export const Navigation = ({ children }: NavigationProps) => {
         >
           <Navbar.Section>
             <Stack>
-              <Button bg="#1A2F48" onClick={() => setOpen(true)}>
-                New Device
+              <Button
+                bg="#1A2F48"
+                sx={{
+                  ':hover': { backgroundColor: '#1A2F48' },
+                }}
+                onClick={() => setOpen(true)}
+                leftIcon={<FiPlus />}
+              >
+                Register Device
               </Button>
               {devicesQuery.isLoading && <Text>Carregando...</Text>}
               {devicesQuery.data &&

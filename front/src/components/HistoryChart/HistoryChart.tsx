@@ -25,7 +25,7 @@ export const HistoryChart = ({
   maxCapacity,
 }: {
   data: AggregatedDeviceHistory[];
-  maxCapacity: number;
+  maxCapacity: string;
 }) => {
   const theme = useMantineTheme();
 
@@ -54,7 +54,7 @@ export const HistoryChart = ({
           <Text key={`item-${index}`} style={{ color: entry.color }}>
             {`${entry.name}: ${entry.value}L (${getPercent(
               entry.value,
-              maxCapacity
+              Number(maxCapacity)
             )})`}
           </Text>
         ))}

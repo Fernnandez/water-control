@@ -3,7 +3,7 @@ import { color } from 'd3-color';
 import { interpolateRgb } from 'd3-interpolate';
 import LiquidFillGauge from 'react-liquid-gauge';
 
-export const LiquidGauge = ({ value }: { value: number }) => {
+export const LiquidGauge = ({ value }: { value: string }) => {
   const theme = useMantineTheme();
 
   const radius = 80;
@@ -11,7 +11,7 @@ export const LiquidGauge = ({ value }: { value: number }) => {
     theme.colors.blue[8],
     theme.colors.blue[8]
   );
-  const fillColor = interpolate(value / 100);
+  const fillColor = interpolate(Number(value) / 100);
   const gradientStops = [
     {
       key: '0%',

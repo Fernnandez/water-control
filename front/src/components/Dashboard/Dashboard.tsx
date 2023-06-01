@@ -2,6 +2,7 @@ import {
   ActionIcon,
   Divider,
   Flex,
+  Grid,
   Group,
   Menu,
   Paper,
@@ -14,13 +15,14 @@ import {
 import { MonthPickerInput } from '@mantine/dates';
 import { DateTime } from 'luxon';
 import { useContext, useEffect, useState } from 'react';
-import { BsThreeDotsVertical, BsTrash } from 'react-icons/bs';
-import { MdEdit, MdOutlineWaterDrop } from 'react-icons/md';
 import { BiBattery } from 'react-icons/bi';
+import { BsThreeDotsVertical, BsTrash, BsCalendar3 } from 'react-icons/bs';
+import { MdEdit, MdOutlineWaterDrop } from 'react-icons/md';
 
 import { useParams } from 'react-router-dom';
-import { AppContext } from '../../contexts/AppContext';
+import { AppContext, IDevice } from '../../contexts/AppContext';
 import BatteryGauge from '../Battery/Battery';
+import { EditDeviceModal } from '../EditDeviceModal/EditDeviceModal';
 import { HistoryChart } from '../HistoryChart/HistoryChart';
 import { LiquidGauge } from '../LiquidGauge/LiquidGaugue';
 
@@ -38,23 +40,38 @@ const filterData = (date: Date, data: any) => {
 
 export const Dashboard = () => {
   const { id } = useParams();
-  const theme = useMantineTheme();
-  const context = useContext(AppContext);
 
-  const [date, setDate] = useState(DateTime.now().toJSDate());
+  const theme = useMantineTheme();
+  const { devices } = useContext(AppContext);
+
+  const [open, setOpen] = useState(false);
+
+  const [date, setDate] = useState<Date | null>(null);
+  const [selectedDevice, setSelectedDevice] = useState<IDevice | null>(null);
+
+  const handleClose = () => setOpen(false);
 
   useEffect(() => {
-    if (context.devices.length) {
-      const selected = context.devices.find((element) => element.id === id);
+    if (devices.length) {
+      const selected = devices.find((element) => element.id === id);
 
       if (selected) {
-        context.setSelectedDevice(selected);
-        setDate(selected.maxDate);
+        setSelectedDevice(selected);
       }
     }
-  }, [id, context.devices]);
+  }, [id]);
 
-  if (context.selectedDevice) {
+  useEffect(() => {
+    if (devices.length) {
+      const selected = devices.find((element) => element.id === id);
+
+      if (selected) {
+        setSelectedDevice(selected);
+      }
+    }
+  }, []);
+
+  if (selectedDevice) {
     return (
       <Flex mih={50} gap="md" align="center" direction="column" wrap="wrap">
         <Group
@@ -67,22 +84,24 @@ export const Dashboard = () => {
             p="xl"
             style={{ minHeight: '300px', minWidth: '400px' }}
           >
-            <Title order={3}>Current Consumption</Title>
+            <Title order={3} color="#EF4B3B">
+              Current Consumption
+            </Title>
             <Divider mt="md" mb="md" />
             <Group spacing="4rem">
               <Stack align="center">
-                <Group>
+                <Group spacing={'xs'}>
                   <MdOutlineWaterDrop color={theme.colors.blue[8]} size={28} />
-                  <Title order={4}>Water</Title>
+                  <Title order={5}>Water Level</Title>
                 </Group>
-                <LiquidGauge value={context.selectedDevice?.percentage} />
+                <LiquidGauge value={selectedDevice?.percentage} />
               </Stack>
               <Stack align="center">
-                <Group>
+                <Group spacing={'xs'}>
                   <BiBattery color={theme.colors.green[6]} size={28} />
-                  <Title order={4}>Battery</Title>
+                  <Title order={5}>Battery Level</Title>
                 </Group>
-                <BatteryGauge value={context.selectedDevice?.battery} />
+                <BatteryGauge value={selectedDevice?.battery} />
               </Stack>
             </Group>
           </Paper>
@@ -90,89 +109,131 @@ export const Dashboard = () => {
           <Paper
             shadow="xl"
             p="xl"
-            style={{ minHeight: '300px', minWidth: '400px' }}
+            style={{ minHeight: '300px', minWidth: '400px', maxWidth: '500px' }}
           >
             <Group w={'100%'} position="apart">
-              <Title order={3}>Device Information</Title>
+              <Title order={3} color="#EF4B3B">
+                Reservatory Information
+              </Title>
               <Menu position="bottom-start" withArrow arrowSize={10}>
                 <Menu.Target>
                   <ActionIcon
                     variant="filled"
-                    style={{ backgroundColor: '#EF4B3B' }}
+                    style={{ backgroundColor: '#1A2F48' }}
                   >
                     <BsThreeDotsVertical />
                   </ActionIcon>
                 </Menu.Target>
                 <Menu.Dropdown>
-                  <Menu.Item icon={<MdEdit size={rem(18)} />}>Editar</Menu.Item>
-                  <Menu.Item icon={<BsTrash size={rem(18)} />} color="red">
-                    Excluir
+                  <Menu.Item
+                    icon={<MdEdit size={rem(18)} />}
+                    onClick={() => setOpen(true)}
+                  >
+                    Edit
+                  </Menu.Item>
+
+                  <Menu.Divider />
+                  <Menu.Label>Danger zone</Menu.Label>
+
+                  <Menu.Item
+                    icon={<BsTrash size={rem(18)} />}
+                    color="red"
+                    // TODO implementar a deleção
+                    onClick={() => {
+                      console.log('delete-item-'.concat(selectedDevice.id));
+                    }}
+                  >
+                    Delete Device
                   </Menu.Item>
                 </Menu.Dropdown>
               </Menu>
             </Group>
             <Divider mt="md" mb="md" />
-            <Group>
-              <Title order={4}>Device Name:</Title>
-              <Text size="lg" color="dimmend">
-                {context.selectedDevice?.name}
-              </Text>
-            </Group>
-            <Group>
-              <Title order={4}>Mac Address:</Title>
-              <Text size="lg" color="dimmend">
-                {context.selectedDevice?.mac}
-              </Text>
-            </Group>
-            <Group>
-              <Title order={4}>Height:</Title>
-              <Text size="lg" color="dimmend">
-                2M
-              </Text>
-            </Group>
-            <Group>
-              <Title order={4}>Base Radius:</Title>
-              <Text size="lg" color="dimmend">
-                1.26M
-              </Text>
-            </Group>
-            <Group>
-              <Title order={4}>Address:</Title>
-              <Text size="lg" color="dimmend">
-                Chico mendes 295, Igarassu, Pernambuco
-              </Text>
-            </Group>
-            <Group>
-              <Title order={4}>Current Volume:</Title>
-              <Text size="lg" color="dimmend">
-                {context.selectedDevice?.water} L
-              </Text>
-            </Group>
+            <Grid>
+              <Grid.Col span={6}>
+                <Group spacing={'xs'}>
+                  <Title order={5}>Device Name:</Title>
+                  <Text color="dimmend">{selectedDevice?.name}</Text>
+                </Group>
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <Group spacing="sm">
+                  <Title order={5}>Mac:</Title>
+                  <Text color="dimmend">{selectedDevice?.mac}</Text>
+                </Group>
+              </Grid.Col>
+              <Grid.Col span={12}>
+                <Group spacing={'xs'}>
+                  <Title order={5}>Address:</Title>
+                  <Text color="dimmend">
+                    Chico mendes 295, Igarassu, Pernambuco
+                  </Text>
+                </Group>
+              </Grid.Col>
+            </Grid>
+
+            <Grid>
+              <Grid.Col span={6}>
+                <Group spacing={'xs'}>
+                  <Title order={5}>Height:</Title>
+                  <Text color="dimmend">2M</Text>
+                </Group>
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <Group spacing={'xs'}>
+                  <Title order={5}>Base Radius:</Title>
+                  <Text color="dimmend">1.26M</Text>
+                </Group>
+              </Grid.Col>
+              <Grid.Col span={12}>
+                <Group spacing={'xs'}>
+                  <Title order={5}>Current Volume:</Title>
+                  <Text color="dimmend">{selectedDevice?.water}L</Text>
+                </Group>
+              </Grid.Col>
+              <Grid.Col span={12}>
+                <Group spacing={'xs'}>
+                  <Title order={5}>Max Volume:</Title>
+                  <Text size="md" color="dimmend">
+                    {selectedDevice?.maxCapacity}L
+                  </Text>
+                </Group>
+              </Grid.Col>
+            </Grid>
           </Paper>
         </Group>
 
         <Paper shadow="xl" p="xl">
           <Group w={'100%'} position="apart">
-            <Title order={3} mb="lg">
+            <Title order={3} color="#EF4B3B">
               History Consumption
             </Title>
             <MonthPickerInput
+              icon={<BsCalendar3 size="1.1rem" />}
               w={200}
               label="Select Month"
-              value={date}
+              value={date || selectedDevice.maxDate}
               onChange={(value: Date) =>
                 setDate(DateTime.fromJSDate(value).toJSDate())
               }
-              minDate={context.selectedDevice?.minDate}
-              maxDate={context.selectedDevice?.maxDate}
+              minDate={selectedDevice?.minDate}
+              maxDate={selectedDevice?.maxDate}
             />
           </Group>
           <Divider mt="md" mb="md" />
           <HistoryChart
-            data={filterData(date, context.selectedDevice?.aggregatedHistory)}
-            maxCapacity={context.selectedDevice?.maxCapacity}
+            data={filterData(
+              date || selectedDevice.maxDate,
+              selectedDevice?.aggregatedHistory
+            )}
+            maxCapacity={selectedDevice?.maxCapacity}
           />
         </Paper>
+        <EditDeviceModal
+          opened={open}
+          device={selectedDevice}
+          onClose={handleClose}
+        />
       </Flex>
     );
   } else return <></>;

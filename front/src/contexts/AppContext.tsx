@@ -2,7 +2,7 @@ import { ReactNode, createContext, useState } from 'react';
 
 export interface AggregatedDeviceHistory {
   date: string;
-  volume: number;
+  volume: string;
   battery: number;
 }
 
@@ -11,9 +11,11 @@ export interface IDevice {
   name: string;
   mac: string;
   battery: number;
-  water: number;
-  percentage: number;
-  maxCapacity: number;
+  water: string;
+  percentage: string;
+  maxCapacity: string;
+  height: string;
+  baseRadius: string;
   aggregatedHistory: AggregatedDeviceHistory[];
   minDate: Date;
   maxDate: Date;
