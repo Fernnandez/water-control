@@ -1,5 +1,7 @@
+import { Carousel } from '@mantine/carousel';
 import {
   AppShell,
+  Box,
   Button,
   Center,
   Flex,
@@ -9,6 +11,9 @@ import {
   RingProgress,
   Stack,
   Text,
+  createStyles,
+  getStylesRef,
+  rem,
 } from '@mantine/core';
 import { DateTime } from 'luxon';
 import { useContext, useEffect, useState } from 'react';
@@ -20,14 +25,33 @@ import { AppContext, IDevice } from '../../contexts/AppContext';
 import useDevice from '../../services/useDevice';
 import { CreateDeviceModal } from '../CreateDeviceModal/CreateDeviceModal';
 import { DeviceCard } from '../DeviceCard/DeviceCard';
+import { DeviceList } from '../DeviceList/DeviceList';
 
 interface NavigationProps {
   children?: React.ReactNode;
 }
 
+const useStyles = createStyles(() => ({
+  controls: {
+    ref: getStylesRef('controls'),
+    transition: 'opacity 150ms ease',
+    opacity: 0,
+  },
+
+  root: {
+    '&:hover': {
+      [`& .${getStylesRef('controls')}`]: {
+        opacity: 1,
+      },
+    },
+  },
+}));
+
 export const Navigation = ({ children }: NavigationProps) => {
   const { setDevices, setSelectedDevice } = useContext(AppContext);
   const { getAll } = useDevice();
+  const { classes } = useStyles();
+
   const devicesQuery = useQuery(['allDevices'], getAll, {
     refetchInterval: 10 * 1000,
     onSuccess: (data) => {
@@ -96,18 +120,10 @@ export const Navigation = ({ children }: NavigationProps) => {
               >
                 Register Device
               </Button>
-              {devicesQuery.isLoading && <Text>Carregando...</Text>}
-              {devicesQuery.data &&
-                devicesQuery.data.length > 0 &&
-                devicesQuery.data.map((device: IDevice) => {
-                  return (
-                    <DeviceCard
-                      uuid={device.id}
-                      name={device.name}
-                      key={device.id}
-                    />
-                  );
-                })}
+
+              {devicesQuery.data && devicesQuery.data.length > 0 && (
+                <DeviceList devices={devicesQuery.data} />
+              )}
             </Stack>
           </Navbar.Section>
 

@@ -17,7 +17,6 @@ export const DeviceCard = ({ uuid, name }: DeviceCardProps) => {
 
   useEffect(() => {
     const id = location.pathname.split('/')[2];
-    console.log(id);
     if (id) {
       setActive(id === uuid);
       const device = context.devices.find((device) => device.id === uuid);
@@ -35,6 +34,7 @@ export const DeviceCard = ({ uuid, name }: DeviceCardProps) => {
         const device = context.devices.find((device) => device.id === uuid);
         if (device) context.setSelectedDevice(device);
       }}
+      mb="md"
       sx={(theme) => ({
         display: 'grid',
         justifyContent: 'center',

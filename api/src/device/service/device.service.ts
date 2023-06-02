@@ -43,7 +43,6 @@ export class DeviceService {
   async create(dto: CreateUpdateDeviceDTO): Promise<Device> {
     await this.verifyMac(dto.mac);
 
-    console.log(dto);
     const newDevice = await this.deviceRepository.save({ ...dto });
 
     this.subscribe(newDevice);
