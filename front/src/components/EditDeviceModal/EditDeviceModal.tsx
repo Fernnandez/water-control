@@ -11,7 +11,8 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useQueryClient } from 'react-query';
 import img from '../../assets/casa.png';
 import { IDevice } from '../../contexts/AppContext';
 import useDevice from '../../services/useDevice';
@@ -27,7 +28,8 @@ export const EditDeviceModal = ({
   device,
   onClose,
 }: EditDeviceModalProps) => {
-  const { createDevice } = useDevice();
+  const { updateDevice } = useDevice();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     handleFormValues(device);
@@ -37,10 +39,10 @@ export const EditDeviceModal = ({
     initialValues: {
       name: '',
       mac: '',
-      maxCapacity: '',
+      address: '',
       height: 0,
       baseRadius: 0,
-      adrress: '',
+      maxCapacity: 0,
     },
     validate: {},
   });
@@ -53,7 +55,8 @@ export const EditDeviceModal = ({
     form.setValues({
       name: device.name,
       mac: device.mac,
-      maxCapacity: device.maxCapacity,
+      address: device.address,
+      maxCapacity: Number(device.maxCapacity),
       baseRadius: Number(device.baseRadius),
       height: Number(device.height),
     });
@@ -79,24 +82,34 @@ export const EditDeviceModal = ({
     form.setFieldValue('mac', formattedMac);
   };
 
-  // TODO implementar edit device no backend
   const handleSubmit = (data: {
     name: string;
     mac: string;
+    address: string;
+    height: number;
+    baseRadius: number;
     maxCapacity: number;
   }) => {
-    createDevice({
-      name: data.name,
-      mac: data.mac,
-      maxCapacity: data.maxCapacity,
-    })
+    updateDevice(
+      {
+        name: data.name,
+        mac: data.mac,
+        address: data.address,
+        height: data.height,
+        baseRadius: data.baseRadius,
+        maxCapacity: data.maxCapacity,
+      },
+      device.id
+    )
       .then(() => {
-        notifications.show({
-          color: 'green',
-          title: 'Success',
-          message: 'Changes saved',
+        queryClient.invalidateQueries('allDevices').then(() => {
+          notifications.show({
+            color: 'green',
+            title: 'Success',
+            message: 'Device updated successfully',
+          });
+          onClose();
         });
-        onClose();
       })
       .catch((error: any) => {
         console.log({ error });
@@ -124,7 +137,7 @@ export const EditDeviceModal = ({
       padding="xl"
       size="md"
     >
-      <form onSubmit={form.onSubmit((values) => console.log({ ...values }))}>
+      <form onSubmit={form.onSubmit((values) => handleSubmit({ ...values }))}>
         <Grid grow gutter="xl" mt=".5rem">
           <Grid.Col span={6}>
             <TextInput
@@ -140,7 +153,6 @@ export const EditDeviceModal = ({
               value={form.values.mac}
               onChange={handleChangeMacAddress}
               label="Mac Address"
-              disabled
               placeholder="00:00:00:00:00:00"
               required
             />
@@ -149,7 +161,6 @@ export const EditDeviceModal = ({
             <TextInput
               label="Reservatory Address"
               placeholder="street and number - city - state"
-              min={0}
               required
               {...form.getInputProps('address')}
             />

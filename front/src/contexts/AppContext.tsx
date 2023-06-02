@@ -10,6 +10,7 @@ export interface IDevice {
   id: string;
   name: string;
   mac: string;
+  address: string;
   battery: number;
   water: string;
   percentage: string;

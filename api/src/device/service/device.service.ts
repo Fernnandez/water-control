@@ -1,12 +1,12 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DateTime } from 'luxon';
 import { Repository } from 'typeorm';
 import { MqttService } from '../../mqtt/mqtt.service';
-import { CreateDeviceDTO } from '../controller/device.controller';
+import { CreateUpdateDeviceDTO } from '../controller/device.controller';
+import { DeviceHistory } from '../entity/device-history.entity';
 import { Device } from '../entity/device.entity';
 import { DeviceHistoryService } from './device-history.service';
-import { DateTime } from 'luxon';
-import { DeviceHistory } from '../entity/device-history.entity';
 
 interface AggregatedDeviceHistory {
   date: string;
@@ -40,18 +40,41 @@ export class DeviceService {
     );
   }
 
-  async create(dto: CreateDeviceDTO): Promise<Device> {
-    const deviceAlreadyExists = await this.findByMac(dto.mac);
+  async create(dto: CreateUpdateDeviceDTO): Promise<Device> {
+    await this.verifyMac(dto.mac);
 
-    if (deviceAlreadyExists) {
-      throw new ConflictException('Device already exists');
-    }
-
+    console.log(dto);
     const newDevice = await this.deviceRepository.save({ ...dto });
 
     this.subscribe(newDevice);
 
     return newDevice;
+  }
+
+  async update(dto: CreateUpdateDeviceDTO, id: string) {
+    const oldDevice = await this.deviceRepository.findOneOrFail({
+      where: { id },
+    });
+
+    if (oldDevice.mac !== dto.mac) {
+      await this.verifyMac(dto.mac);
+      await this.deviceRepository.update(id, dto);
+      const updateddevice = await this.findOne(id);
+      this.unsubscribe(oldDevice);
+      this.subscribe(updateddevice);
+    } else {
+      await this.deviceRepository.update(id, dto);
+    }
+  }
+
+  async delete(id: string): Promise<void> {
+    const device = await this.deviceRepository.findOneOrFail({
+      where: { id },
+    });
+
+    await this.deviceRepository.delete(id);
+
+    this.unsubscribe(device);
   }
 
   async findByMac(mac: string): Promise<Device> {
@@ -73,6 +96,14 @@ export class DeviceService {
       where: { id },
       relations: ['devicesHistory'],
     });
+  }
+
+  async verifyMac(mac: string): Promise<void> {
+    const deviceAlreadyExists = await this.findByMac(mac);
+
+    if (deviceAlreadyExists) {
+      throw new ConflictException('Device already exists');
+    }
   }
 
   calcCurrentVolume(distance: number, device: Device): number {
@@ -118,7 +149,7 @@ export class DeviceService {
   }
 
   subscribe(device: Device): void {
-    console.log(`Subscribing to ${device.mac}`);
+    Logger.log(`Subscribing to ${device.mac}`);
     this.mqttService.subscribe(device.mac, (msg) => {
       const dto = JSON.parse(msg);
 
@@ -129,7 +160,9 @@ export class DeviceService {
         device.maxCapacity
       ).toFixed(2);
 
-      console.log(currentVolume, currentPercentage);
+      Logger.log(
+        `Receiving update from ${device.mac} - currentVolume: ${currentVolume} - currentPercentage: ${currentPercentage}`,
+      );
 
       this.deviceHistoryService.create({
         volume: currentVolume,
@@ -143,5 +176,10 @@ export class DeviceService {
         water: currentVolume,
       });
     });
+  }
+
+  unsubscribe(device: Device): void {
+    Logger.log(`Unsubscribing to ${device.mac}`);
+    this.mqttService.unsubscribe(device.mac);
   }
 }

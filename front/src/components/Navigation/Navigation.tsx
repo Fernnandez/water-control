@@ -34,14 +34,19 @@ export const Navigation = ({ children }: NavigationProps) => {
       const newData = data.map((device: IDevice) => {
         return {
           ...device,
-          minDate: DateTime.fromFormat(
-            device.aggregatedHistory[0].date,
-            'dd/MM/yy'
-          ).toJSDate(),
-          maxDate: DateTime.fromFormat(
-            device.aggregatedHistory[device.aggregatedHistory.length - 1].date,
-            'dd/MM/yy'
-          ).toJSDate(),
+          minDate:
+            device.aggregatedHistory.length &&
+            DateTime.fromFormat(
+              device.aggregatedHistory[0].date,
+              'dd/MM/yy'
+            ).toJSDate(),
+          maxDate:
+            device.aggregatedHistory.length &&
+            DateTime.fromFormat(
+              device.aggregatedHistory[device.aggregatedHistory.length - 1]
+                ?.date,
+              'dd/MM/yy'
+            ).toJSDate(),
         };
       });
       setDevices(newData);

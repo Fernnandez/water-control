@@ -10,9 +10,10 @@ import {
   Title,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import useDevice from '../../services/useDevice';
 import { notifications } from '@mantine/notifications';
+import { useQueryClient } from 'react-query';
 import img from '../../assets/casa.png';
+import useDevice from '../../services/useDevice';
 
 interface CreateDeviceModalProps {
   opened: boolean;
@@ -24,12 +25,16 @@ export const CreateDeviceModal = ({
   onClose,
 }: CreateDeviceModalProps) => {
   const { createDevice } = useDevice();
+  const queryClient = useQueryClient();
 
   const form = useForm({
     initialValues: {
       name: '',
       mac: '',
+      address: '',
       maxCapacity: 0,
+      height: 0,
+      baseRadius: 0,
     },
     validate: {},
   });
@@ -57,20 +62,28 @@ export const CreateDeviceModal = ({
   const handleSubmit = (data: {
     name: string;
     mac: string;
+    address: string;
+    height: number;
+    baseRadius: number;
     maxCapacity: number;
   }) => {
     createDevice({
       name: data.name,
       mac: data.mac,
+      address: data.address,
+      height: data.height,
+      baseRadius: data.baseRadius,
       maxCapacity: data.maxCapacity,
     })
       .then(() => {
-        notifications.show({
-          color: 'green',
-          title: 'Success',
-          message: 'New device registered',
+        queryClient.invalidateQueries('allDevices').then(() => {
+          notifications.show({
+            color: 'green',
+            title: 'Success',
+            message: 'Device registered successfully',
+          });
+          onClose();
         });
-        onClose();
       })
       .catch((error: any) => {
         console.log({ error });
@@ -123,11 +136,8 @@ export const CreateDeviceModal = ({
             <TextInput
               label="Reservatory Address"
               placeholder="street and number - city - state"
-              // hideControls
-              min={0}
-              // precision={0}
               required
-              // {...form.getInputProps('maxCapacity')}
+              {...form.getInputProps('address')}
             />
           </Grid.Col>
         </Grid>
@@ -142,7 +152,7 @@ export const CreateDeviceModal = ({
               min={0}
               precision={2}
               required
-              {...form.getInputProps('maxCapacity')}
+              {...form.getInputProps('height')}
             />
             <NumberInput
               label="Base Radius (M)"
@@ -150,7 +160,7 @@ export const CreateDeviceModal = ({
               min={0}
               precision={2}
               required
-              {...form.getInputProps('maxCapacity')}
+              {...form.getInputProps('baseRadius')}
             />
             <NumberInput
               label="Max Capacity (L)"

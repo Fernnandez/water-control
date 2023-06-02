@@ -12,6 +12,9 @@ export class Device {
   @Column()
   name: string;
 
+  @Column()
+  address: string;
+
   @Column({ default: 0 })
   battery: number;
 

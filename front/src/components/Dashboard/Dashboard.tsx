@@ -1,6 +1,5 @@
 import {
   ActionIcon,
-  Affix,
   Divider,
   Flex,
   Grid,
@@ -17,11 +16,14 @@ import { MonthPickerInput } from '@mantine/dates';
 import { DateTime } from 'luxon';
 import { useContext, useEffect, useState } from 'react';
 import { BiBattery } from 'react-icons/bi';
-import { BsThreeDotsVertical, BsTrash, BsCalendar3 } from 'react-icons/bs';
+import { BsCalendar3, BsThreeDotsVertical, BsTrash } from 'react-icons/bs';
 import { MdEdit, MdOutlineWaterDrop } from 'react-icons/md';
 
-import { useParams } from 'react-router-dom';
+import { notifications } from '@mantine/notifications';
+import { useQueryClient } from 'react-query';
+import { useNavigate, useParams } from 'react-router-dom';
 import { AppContext, IDevice } from '../../contexts/AppContext';
+import useDevice from '../../services/useDevice';
 import BatteryGauge from '../Battery/Battery';
 import { EditDeviceModal } from '../EditDeviceModal/EditDeviceModal';
 import { HistoryChart } from '../HistoryChart/HistoryChart';
@@ -41,6 +43,11 @@ const filterData = (date: Date, data: any) => {
 
 export const Dashboard = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+
+  const queryClient = useQueryClient();
+
+  const { deleteDevice } = useDevice();
 
   const theme = useMantineTheme();
   const { devices } = useContext(AppContext);
@@ -52,6 +59,28 @@ export const Dashboard = () => {
 
   const handleClose = () => setOpen(false);
 
+  const handleDelete = (id: string) => {
+    deleteDevice(id)
+      .then(() => {
+        queryClient.invalidateQueries('allDevices').then(() => {
+          notifications.show({
+            color: 'green',
+            title: 'Success',
+            message: 'Device removed successfully',
+          });
+          navigate('/');
+        });
+      })
+      .catch((error) => {
+        console.log({ error });
+        notifications.show({
+          color: 'red',
+          title: 'Error',
+          message: error.message,
+        });
+      });
+  };
+
   useEffect(() => {
     if (devices.length) {
       const selected = devices.find((element) => element.id === id);
@@ -60,7 +89,7 @@ export const Dashboard = () => {
         setSelectedDevice(selected);
       }
     }
-  }, [id]);
+  }, [id, devices]);
 
   useEffect(() => {
     if (devices.length) {
@@ -139,9 +168,8 @@ export const Dashboard = () => {
                   <Menu.Item
                     icon={<BsTrash size={rem(18)} />}
                     color="red"
-                    // TODO implementar a deleção
                     onClick={() => {
-                      console.log('delete-item-'.concat(selectedDevice.id));
+                      handleDelete(selectedDevice.id);
                     }}
                   >
                     Delete Device

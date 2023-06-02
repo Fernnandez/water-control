@@ -1,7 +1,7 @@
 import { Divider, Image, Paper, Text } from '@mantine/core';
 
-import { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { useContext, useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import img from '../../assets/casa.png';
 import { AppContext } from '../../contexts/AppContext';
 
@@ -12,8 +12,20 @@ interface DeviceCardProps {
 
 export const DeviceCard = ({ uuid, name }: DeviceCardProps) => {
   const context = useContext(AppContext);
+  const location = useLocation();
+  const [active, setActive] = useState(false);
 
-  const active = context.selectedDevice?.id === uuid;
+  useEffect(() => {
+    const id = location.pathname.split('/')[2];
+    console.log(id);
+    if (id) {
+      setActive(id === uuid);
+      const device = context.devices.find((device) => device.id === uuid);
+      if (device) context.setSelectedDevice(device);
+    } else {
+      setActive(false);
+    }
+  }, [location]);
 
   return (
     <Paper
