@@ -2,8 +2,8 @@ import { Divider, Image, Paper, Text } from '@mantine/core';
 
 import { useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import img from '../../assets/casa.png';
-import { AppContext } from '../../contexts/AppContext';
+import img from '../../../../assets/casa.png';
+import { AppContext } from '../../../../contexts/AppContext';
 
 interface DeviceCardProps {
   uuid: string;

@@ -23,9 +23,9 @@ import { Link } from 'react-router-dom';
 import logo from '../../assets/logo-white.svg';
 import { AppContext, IDevice } from '../../contexts/AppContext';
 import useDevice from '../../services/useDevice';
-import { CreateDeviceModal } from '../CreateDeviceModal/CreateDeviceModal';
-import { DeviceCard } from '../DeviceCard/DeviceCard';
-import { DeviceList } from '../DeviceList/DeviceList';
+import { CreateDeviceModal } from '../Dashboard/Modals/CreateDeviceModal/CreateDeviceModal';
+import { DeviceCard } from './DeviceList/DeviceCard/DeviceCard';
+import { DeviceList } from './DeviceList/DeviceList';
 
 interface NavigationProps {
   children?: React.ReactNode;

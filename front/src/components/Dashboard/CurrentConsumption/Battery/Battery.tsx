@@ -3,7 +3,7 @@ export default BatteryGauge;
 import { Box, useMantineTheme } from '@mantine/core';
 import { useEffect, useState } from 'react';
 
-function BatteryGauge({ value = 0 }) {
+function BatteryGauge({ value }: { value: string }) {
   const theme = useMantineTheme();
   const [color, setColor] = useState(theme.colors.green[6]);
 

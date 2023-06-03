@@ -9,7 +9,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { AggregatedDeviceHistory } from '../../contexts/AppContext';
+import { AggregatedDeviceHistory } from '../../../../contexts/AppContext';
 
 const toPercent = (decimal: number, fixed = 0) =>
   `${(decimal * 100).toFixed(fixed)}%`;

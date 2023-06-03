@@ -1,6 +1,6 @@
 import { ScrollArea } from '@mantine/core';
-import { IDevice } from '../../contexts/AppContext';
-import { DeviceCard } from '../DeviceCard/DeviceCard';
+import { IDevice } from '../../../contexts/AppContext';
+import { DeviceCard } from './DeviceCard/DeviceCard';
 
 export const DeviceList = ({ devices }: { devices: IDevice[] }) => {
   return (
