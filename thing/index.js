@@ -2,8 +2,7 @@ import mqtt from 'mqtt';
 import { DateTime } from 'luxon';
 import { devices } from './devices.js';
 
-const client = mqtt.connect('mqtt://localhost:1883');
-
+const client = mqtt.connect('mqtt://broker.hivemq.com:1883');
 // GERAR DADOS ATUAIS A CADA 30 SEGUNDOS
 client.on('connect', () => {
   console.log('Conectado ao broker MQTT');
@@ -42,7 +41,11 @@ client.on('connect', () => {
         battery: isBatteryDead ? 100 : currentBattery, // Define o nível de bateria como 0 se estiver descarregada
       };
     });
-  }, 30 * 1000);
+  }, 10 * 1000);
+});
+
+client.on('error', (error) => {
+  console.error(error);
 });
 
 // GERAR DADOS HISTORICOS ATÉ O DIA ATUAL

@@ -163,16 +163,19 @@ export class DeviceService {
         `Receiving update from ${device.mac} - currentVolume: ${currentVolume} - currentPercentage: ${currentPercentage}`,
       );
 
+      console.log(currentPercentage);
+      console.log(currentVolume);
+
       this.deviceHistoryService.create({
-        volume: currentVolume,
-        battery: dto.battery,
+        volume: Number(currentVolume),
+        battery: Number(dto.battery),
         timestamp: new Date(dto.timestamp),
         device,
       });
       this.deviceRepository.update(device.id, {
         percentage: Number(currentPercentage),
-        battery: dto.battery,
-        water: currentVolume,
+        battery: Number(dto.battery),
+        water: Number(currentVolume),
       });
     });
   }

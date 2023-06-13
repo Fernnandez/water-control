@@ -6,7 +6,7 @@ export class MqttService {
   private client: mqtt.Client;
 
   constructor() {
-    this.client = mqtt.connect('mqtt://localhost:1883');
+    this.client = mqtt.connect('mqtt://broker.hivemq.com:1883');
   }
 
   subscribe(topic: string, callback: (message: string) => void) {
