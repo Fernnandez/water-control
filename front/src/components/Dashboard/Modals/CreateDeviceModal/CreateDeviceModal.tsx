@@ -123,6 +123,7 @@ export const CreateDeviceModal = ({
               label="Name"
               placeholder="device name"
               required
+              name="name"
               {...form.getInputProps('name')}
             />
           </Grid.Col>
@@ -131,6 +132,7 @@ export const CreateDeviceModal = ({
               maxLength={17}
               value={form.values.mac}
               onChange={handleChangeMacAddress}
+              name="mac"
               label="Mac Address"
               placeholder="00:00:00:00:00:00
               "
@@ -142,6 +144,7 @@ export const CreateDeviceModal = ({
               label="Reservatory Address"
               placeholder="street and number - city - state"
               required
+              name="address"
               {...form.getInputProps('address')}
             />
           </Grid.Col>
@@ -157,6 +160,7 @@ export const CreateDeviceModal = ({
               min={0}
               precision={2}
               required
+              name="height"
               {...form.getInputProps('height')}
             />
             <NumberInput
@@ -165,6 +169,7 @@ export const CreateDeviceModal = ({
               min={0}
               precision={2}
               required
+              name="baseRadius"
               {...form.getInputProps('baseRadius')}
             />
             <NumberInput
@@ -173,6 +178,7 @@ export const CreateDeviceModal = ({
               min={0}
               precision={2}
               required
+              name="maxCapacity"
               {...form.getInputProps('maxCapacity')}
             />
           </Grid.Col>

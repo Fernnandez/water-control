@@ -77,7 +77,11 @@ export const ReservatoryInformation = ({
         </Title>
         <Menu position="bottom-start" withArrow arrowSize={10}>
           <Menu.Target>
-            <ActionIcon variant="filled" style={{ backgroundColor: '#1A2F48' }}>
+            <ActionIcon
+              variant="filled"
+              style={{ backgroundColor: '#1A2F48' }}
+              data-testid="options-button"
+            >
               <BsThreeDotsVertical />
             </ActionIcon>
           </Menu.Target>
@@ -85,6 +89,7 @@ export const ReservatoryInformation = ({
             <Menu.Item
               icon={<MdEdit size={rem(18)} />}
               onClick={() => handleOpenModal()}
+              data-testid="edit-button"
             >
               Edit
             </Menu.Item>
@@ -96,6 +101,7 @@ export const ReservatoryInformation = ({
               icon={<BsTrash size={rem(18)} />}
               color="red"
               onClick={() => handleDelete(id)}
+              data-testid="delete-button"
             >
               Delete Device
             </Menu.Item>
