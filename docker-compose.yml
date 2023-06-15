@@ -6,7 +6,6 @@ services:
     container_name: mosquitto
     ports:
       - '1883:1883'
-      - '9001:9001'
     networks:
       - development
 
@@ -18,7 +17,7 @@ services:
       POSTGRES_USER: dev
       POSTGRES_DB: water_db
     ports:
-      - 5432:5432 
+      - 5432:5432
     networks:
       - development
 
