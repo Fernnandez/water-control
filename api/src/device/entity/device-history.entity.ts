@@ -6,7 +6,7 @@ export class DeviceHistory {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })
   battery: number;
 
   @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })
