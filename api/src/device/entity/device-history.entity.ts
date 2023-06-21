@@ -15,6 +15,8 @@ export class DeviceHistory {
   @Column()
   timestamp: Date;
 
-  @ManyToOne(() => Device, (device) => device.devicesHistory)
+  @ManyToOne(() => Device, (device) => device.devicesHistory, {
+    onDelete: 'CASCADE',
+  })
   device: Device;
 }
