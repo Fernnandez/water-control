@@ -43,7 +43,9 @@ function BatteryGauge({ value }: { value: string }) {
         }}
       >
         <span>
-          <span style={{ fontSize: '38px', color: '#1A2F48' }}>{value}</span>
+          <span style={{ fontSize: '38px', color: '#1A2F48' }}>
+            {Number(value).toFixed(0)}
+          </span>
           <span style={{ fontSize: `${38 * 0.6}px`, color: '#1A2F48' }}>%</span>
         </span>
       </Box>

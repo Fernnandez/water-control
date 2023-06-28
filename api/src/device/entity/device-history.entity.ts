@@ -6,7 +6,7 @@ export class DeviceHistory {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })
   battery: number;
 
   @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })
@@ -15,6 +15,8 @@ export class DeviceHistory {
   @Column()
   timestamp: Date;
 
-  @ManyToOne(() => Device, (device) => device.devicesHistory)
+  @ManyToOne(() => Device, (device) => device.devicesHistory, {
+    onDelete: 'CASCADE',
+  })
   device: Device;
 }
