@@ -50,6 +50,11 @@ try:
         msg=random.randint(inicio_random,fim_random) #para o random entrar no loop. Inicia uma função random(nativa do python) 
         client.publish(TOPIC, msg)#publica a mensagem 
         time.sleep(time_sleep_pub)#espera o tempo da variável time_sleep_pub, ficando sem fazer nada nesse meio tempo 
+        publish_time = datetime.now()
+        message_info = {
+            'publish_time': publish_time
+                }
+        client.user_data_set(message_info)
 except KeyboardInterrupt:#quando clicar Ctrln+C 
     print("\nSaindo") 
     client.disconnect()#Desconecta do broker 
