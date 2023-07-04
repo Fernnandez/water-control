@@ -33,8 +33,8 @@ Sabe-se que o TLS irá ter uma latência maior, já que o tamanho do pacote tamb
 
 O cálculo do resultado do teste foi feito da seguinte maneira: 
 
-- Diferença em valor bruto = (Média da latência da comunicação com TLS)-(Média da latência da comunicação sem TLS)
-- Valor percentual da diferença:  ((Diferença em valor bruto) / (Média da latência da comunicação com TLS)) * 100
+- Diferença em valor bruto = (Média da latência da comunicação com TLS) - (Média da latência da comunicação sem TLS)
+- Valor percentual da diferença = ((Diferença em valor bruto) / (Média da latência da comunicação com TLS)) * 100
 ## Pastas de Testes
 
 - [Diretório com planilhas contendo os testes da latência com TLS](./csv_with_tls).
