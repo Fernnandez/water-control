@@ -32,6 +32,41 @@ media_escrita = False
 data_arquivo = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 FILENAME = f"./csv_with_tls/resultado_{data_arquivo}.csv"
 
+
+
+
+def encontrar_maior_e_menor_valor(arquivo):
+    maior_valor = None
+    menor_valor = None
+
+    with open(arquivo, 'r') as arquivo_csv:
+        linhas = arquivo_csv.readlines()
+
+        # Iterar sobre as linhas do arquivo
+        for linha in linhas:
+            valor = linha.strip()  # Remover espaços em branco no início e no fim
+
+            # Ignorar linhas que não possuem valores numéricos
+            if not valor.replace('.', '').isdigit():
+                continue
+
+            valor = float(valor)  # Converter a linha em um valor float
+
+            # Atualizar o maior valor se for o caso
+            if maior_valor is None or valor > maior_valor:
+                maior_valor = valor
+
+            # Atualizar o menor valor se for o caso
+            if menor_valor is None or valor < menor_valor:
+                menor_valor = valor
+
+    # Adicionar os valores destacados no final do arquivo
+    with open(arquivo, 'a') as arquivo_csv:
+        arquivo_csv.write(f'\nMaior valor: {maior_valor}\n')
+        arquivo_csv.write(f'Menor valor: {menor_valor}\n')
+
+
+
 def escrever_antes_media(valor):
     if os.path.exists(FILENAME):
         # Abrir o arquivo existente em modo de adição (append)
@@ -75,6 +110,7 @@ def calculo_media(delivery_duration):
         print("===============================")
         if not media_escrita:
             escrever_media(media)
+            encontrar_maior_e_menor_valor(FILENAME)
             media_escrita = True
 
 
