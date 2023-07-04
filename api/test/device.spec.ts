@@ -183,14 +183,23 @@ describe('CRUD Operations', () => {
       verifyMacMock.mockRestore();
     });
 
-    it('should delete device and unsubscribe from MQTT topic', async () => {
+    it('should update device and dont subscribe if MAC is same', async () => {
       // Arrange
       const id = 'a3feaeae-0cac-48db-86d0-d66b70af7666';
 
-      const device: Device = {
-        id: 'a3feaeae-0cac-48db-86d0-d66b70af7666',
-        name: 'Device 1',
+      const dto: CreateUpdateDeviceDTO = {
+        name: 'Device updated',
         mac: '00:11:22:33:44:55',
+        address: 'Address 1',
+        height: 2.0,
+        baseRadius: 1.6,
+        maxCapacity: 100000,
+      };
+
+      const oldDevice: Device = {
+        id,
+        mac: '00:11:22:33:44:55',
+        name: 'Device 1',
         address: 'Address 1',
         height: 2.0,
         baseRadius: 1.6,
@@ -201,23 +210,49 @@ describe('CRUD Operations', () => {
         devicesHistory: [] as DeviceHistory[],
       };
 
-      deviceRepository.findOneOrFail = jest.fn().mockResolvedValue(device);
-      deviceRepository.delete = jest.fn();
-      deviceService.unsubscribe = jest.fn();
+      const updatedDevice: Device = {
+        id,
+        mac: dto.mac,
+        address: dto.address,
+        height: dto.height,
+        baseRadius: dto.baseRadius,
+        maxCapacity: dto.maxCapacity,
+        name: dto.name,
+        battery: 0,
+        water: 0,
+        percentage: 0,
+        devicesHistory: [] as DeviceHistory[],
+      };
 
-      jest.spyOn(deviceRepository, 'findOneOrFail').mockResolvedValue(device);
-      jest.spyOn(deviceRepository, 'delete');
-      jest.spyOn(deviceService, 'unsubscribe');
+      const findOneOrFailMock = jest
+        .spyOn(deviceRepository, 'findOneOrFail')
+        .mockResolvedValue(oldDevice);
+      const findOneMock = jest
+        .spyOn(deviceRepository, 'findOne')
+        .mockResolvedValue(updatedDevice);
+      const findByMacMock = jest
+        .spyOn(deviceService, 'findByMac')
+        .mockResolvedValue(null);
+      const updateMock = jest.spyOn(deviceRepository, 'update');
+      const unsubscribeMock = jest.spyOn(deviceService, 'unsubscribe');
+      const subscribeMock = jest.spyOn(deviceService, 'subscribe');
+      const verifyMacMock = jest.spyOn(deviceService, 'verifyMac');
 
       // Act
-      await deviceService.delete(id);
+      await deviceService.update(dto, id);
 
       // Assert
-      expect(deviceRepository.findOneOrFail).toHaveBeenCalledWith({
-        where: { id },
-      });
-      expect(deviceRepository.delete).toHaveBeenCalledWith(id);
-      expect(deviceService.unsubscribe).toHaveBeenCalledWith(device);
+      expect(updateMock).toHaveBeenCalledWith(id, dto);
+      expect(unsubscribeMock).toHaveBeenCalledTimes(0);
+      expect(subscribeMock).toHaveBeenCalledTimes(0);
+
+      findOneOrFailMock.mockRestore();
+      findOneMock.mockRestore();
+      findByMacMock.mockRestore();
+      updateMock.mockRestore();
+      unsubscribeMock.mockRestore();
+      subscribeMock.mockRestore();
+      verifyMacMock.mockRestore();
     });
   });
 

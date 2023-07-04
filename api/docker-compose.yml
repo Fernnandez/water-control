@@ -1,14 +1,6 @@
 version: '3'
 
 services:
-  mosquitto:
-    image: eclipse-mosquitto:1.6.12
-    container_name: mosquitto
-    ports:
-      - '1883:1883'
-    networks:
-      - development
-
   postgres:
     image: postgres:11.4
     container_name: postgres

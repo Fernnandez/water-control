@@ -4,9 +4,12 @@
 #include <PubSubClient.h>
 #include <WiFiClientSecure.h>
 
+#define TrigPin 12
+#define EchoPin 14
+
 /********** WiFi Connection Details **********/
-const char* ssid = "absteste";
-const char* password = "12345678";
+const char* ssid = "DTEL_ALBERES_2.4";
+const char* password = "#MFDO1983@";
 
 /********** MQTT Broker Connection Details **********/
 const char* mqtt_server = "f9ca89e3f5df46e6a4b2e122b2d56a3c.s2.eu.hivemq.cloud"; // public MQTT broker
@@ -60,7 +63,7 @@ WiFiClientSecure espClient;
 PubSubClient client(espClient);
 
 /********** Global State Variables **********/
-const int updateInterval = 30000; // Intervalo de atualização em milissegundos
+const int updateInterval = 10000; // Intervalo de atualização em milissegundos
 int previousDistance = 0;
 int previousBattery = 100;
 
@@ -118,6 +121,9 @@ void reconnect() {
 void setup() {
   Serial.begin(9600);
   
+  pinMode(TrigPin, OUTPUT);
+  pinMode(EchoPin, INPUT);
+
   setupWiFi();
 
   #ifdef ESP8266
@@ -142,6 +148,15 @@ void loop() {
 
   digitalWrite(LED_BUILTIN, LOW); // Liga o LED
 
+  digitalWrite(TrigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TrigPin, HIGH);
+  delayMicroseconds(10);
+
+  float durationindigit = pulseIn(EchoPin, HIGH);
+
+  float distance = (durationindigit/2) / 29.1;
+
   // Simulação da alteração da distância do sensor
   int diffDistance = random(-10, 11);
   int currentDistance = constrain(previousDistance + diffDistance, 0, device.height);
@@ -151,7 +166,7 @@ void loop() {
 
   // Criação da mensagem MQTT com a distância atual e nível de bateria
   String macAddress = device.macAddress;
-  String message = "{\"distance\": " + String(currentDistance) + ", \"battery\": " + String(currentBattery) + ", \"timestamp\": " + String(timestamp) + "}";
+  String message = "{\"distance\": " + String(distance) + ", \"battery\": " + String(currentBattery) + ", \"timestamp\": " + String(timestamp) + "}";
 
   Serial.print("Enviando mensagem para o tópico: ");
   Serial.println(macAddress);

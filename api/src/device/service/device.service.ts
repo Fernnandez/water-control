@@ -166,7 +166,7 @@ export class DeviceService {
       this.deviceHistoryService.create({
         volume: Number(currentVolume),
         battery: Number(dto.battery),
-        timestamp: new Date(dto.timestamp),
+        timestamp: new Date(dto.timestamp * 1000),
         device,
       });
       this.deviceRepository.update(device.id, {
