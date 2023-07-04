@@ -1,6 +1,6 @@
-# Comparação de Latência na Comunicação via MQTT
+# Teste de Latência na Comunicação via MQTT
 
-Este projeto teve como objetivo comparar a latência na comunicação via MQTT com e sem TLS.
+Este teste teve como objetivo comparar a latência na comunicação via MQTT com e sem TLS.
 
 Foram realizadas 100.000 publicações em ambos os casos, com e sem TLS. Os primeiros 10 casos foram eliminados para obter uma média mais precisa. No [Publisher com TLS](publisher_tls.py) e [Publisher sem o TLS](publisher_without_tls.py),como não há um time/sleep no laço que faz o publisher(método publish), a execução do publish acontecerá da maneira muito mais rápida, afinal, poderá ser feito até milhares de publicações em um segundo
 
