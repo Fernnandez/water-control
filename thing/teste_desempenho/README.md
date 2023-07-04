@@ -2,7 +2,7 @@
 
 Este projeto teve como objetivo comparar a latência na comunicação via MQTT com e sem TLS.
 
-Foram realizadas 100.000 publicações em ambos os casos, com e sem TLS. Os primeiros 10 casos foram eliminados para obter uma média mais precisa.
+Foram realizadas 100.000 publicações em ambos os casos, com e sem TLS. Os primeiros 10 casos foram eliminados para obter uma média mais precisa. No [Publisher com TLS](publisher_tls.py) e [Publisher sem o TLS](publisher_without_tls.py),como não há um time/sleep no laço que faz o publisher(método publish), a execução do publish acontecerá da maneira muito mais rápida, afinal, poderá ser feito até milhares de publicações em um segundo
 
 ## Resultados
 
@@ -26,6 +26,15 @@ Durante o teste, a velocidade da internet utilizada foi a seguinte:
 - Velocidade de download: 250 Mb/s
 - Velocidade de upload: 150 Mb/s
 
+
+## Cálculo do resultado
+
+Sabe-se que o TLS irá ter uma latência maior, já que o tamanho do pacote também será maior.
+
+O cálculo do resultado do teste foi feito da seguinte maneira: 
+
+- Diferença em valor bruto = (Média da latência da comunicação com TLS)-(Média da latência da comunicação sem TLS)
+- Valor percentual da diferença:  ((Diferença em valor bruto) / (Média da latência da comunicação com TLS)) * 100
 ## Pastas de Testes
 
 - [Diretório com planilhas contendo os testes da latência com TLS](./csv_with_tls).
