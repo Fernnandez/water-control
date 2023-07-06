@@ -8,8 +8,8 @@
 #define EchoPin 14
 
 /********** WiFi Connection Details **********/
-const char* ssid = "DTEL_ALBERES_2.4";
-const char* password = "#MFDO1983@";
+const char* ssid = "viva 3G";
+const char* password = "12345678";
 
 /********** MQTT Broker Connection Details **********/
 const char* mqtt_server = "f9ca89e3f5df46e6a4b2e122b2d56a3c.s2.eu.hivemq.cloud"; // public MQTT broker
@@ -160,6 +160,10 @@ void loop() {
   // Simulação da alteração da distância do sensor
   int diffDistance = random(-10, 11);
   int currentDistance = constrain(previousDistance + diffDistance, 0, device.height);
+
+  if(previousBattery < 25){
+    previousBattery = 100;
+  }
 
   // Simulação da diminuição da bateria
   int currentBattery = max(previousBattery - 1, 0);
