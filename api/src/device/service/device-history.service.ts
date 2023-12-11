@@ -12,13 +12,13 @@ export class DeviceHistoryService {
   ) {}
 
   async create(dto: {
-    volume: number;
+    water: number;
     battery: number;
     timestamp: Date;
     device: Device;
   }): Promise<DeviceHistory> {
     return await this.deviceHisotryRepository.save({
-      water: dto.volume,
+      water: dto.water,
       battery: dto.battery,
       timestamp: dto.timestamp,
       device: dto.device,

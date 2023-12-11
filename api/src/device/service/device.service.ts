@@ -164,7 +164,7 @@ export class DeviceService {
       );
 
       this.deviceHistoryService.create({
-        volume: Number(currentVolume),
+        water: Number(currentVolume),
         battery: Number(dto.battery),
         timestamp: new Date(dto.timestamp * 1000),
         device,
