@@ -36,6 +36,10 @@ export class DeviceController {
     return await this.deviceService.update(dto, id);
   }
 
+  // http://localhost:3000/devices/history/00:00:00:00:00:00
+  // verbo HTTP POST
+  // body: { "distance": 0.5, "battery": 90, "timestamp": "2021-10-01T00:00:00.000Z" }
+
   @Post('history/:mac')
   async createHistory(
     @Body() dto: { distance: number; battery: number; timestamp: Date },
