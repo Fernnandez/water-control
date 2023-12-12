@@ -90,7 +90,7 @@ export class DeviceService {
     return devices.map((device) => this.mapDeviceToAggregatedHistory(device));
   }
 
-  findOne(id: string): Promise<Device> {
+  async findOne(id: string): Promise<Device> {
     return this.deviceRepository.findOne({
       where: { id },
       relations: ['devicesHistory'],
@@ -103,6 +103,36 @@ export class DeviceService {
     if (deviceAlreadyExists) {
       throw new ConflictException('Device already exists');
     }
+  }
+
+  async createHistory(
+    dto: { distance: number; battery: number; timestamp: Date },
+    deviceMac: string,
+  ) {
+    const device = await this.findByMac(deviceMac);
+
+    const currentVolume = this.calcCurrentVolume(dto.distance, device);
+
+    const currentPercentage = (
+      (currentVolume * 100) /
+      device.maxCapacity
+    ).toFixed(2);
+
+    Logger.log(
+      `Receiving update from ${device.mac} - currentVolume: ${currentVolume} - currentPercentage: ${currentPercentage}`,
+    );
+
+    this.deviceHistoryService.create({
+      water: Number(currentVolume),
+      battery: Number(dto.battery),
+      timestamp: new Date(dto.timestamp),
+      device,
+    });
+    this.deviceRepository.update(device.id, {
+      percentage: Number(currentPercentage),
+      battery: Number(dto.battery),
+      water: Number(currentVolume),
+    });
   }
 
   calcCurrentVolume(distance: number, device: Device): number {

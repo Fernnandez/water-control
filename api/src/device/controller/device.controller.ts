@@ -36,6 +36,14 @@ export class DeviceController {
     return await this.deviceService.update(dto, id);
   }
 
+  @Post('history/:mac')
+  async createHistory(
+    @Body() dto: { distance: number; battery: number; timestamp: Date },
+    @Param('mac') mac: string,
+  ) {
+    return await this.deviceService.createHistory(dto, mac);
+  }
+
   @Delete(':id')
   async delete(@Param('id') id: string): Promise<void> {
     return await this.deviceService.delete(id);
