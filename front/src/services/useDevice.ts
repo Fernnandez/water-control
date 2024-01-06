@@ -2,6 +2,7 @@ import api from '../config/axios';
 
 function useDevice() {
   async function createDevice(data: any) {
+    console.log(data);
     const response = await api.post('/devices/', data);
     return response.data;
   }

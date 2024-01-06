@@ -28,11 +28,7 @@ PubSubClient client(espClient);
 
 /********** Global State Variables **********/
 int updateInterval = 10000;
-int previousBattery = 100;
 const int pinA0 = A0;
-const float Vin = 5.0;  // Voltagem de entrada que você quer medir (por exemplo, 5V)
-const float Vref = 3.3; // Tensão de referência do ESP8266 (3.3V para o ESP8266)
-
 
 struct Device {
   String macAddress;
@@ -73,41 +69,62 @@ float readDistanceSensor() {
 }
 
 float readVoltageSensor() {
-  int sensorValue = analogRead(pinA0);
-  float tensao = sensorValue * (3.3 / 1023.0);
-  return (sensorValue / 1023.0) * Vref;
+  int nVoltageRaw = analogRead(A0);
+  return nVoltageRaw;
 }
 
-void makeHttpRequest(const char* host, const char* endpoint) {
-
+void verifyAdaptation(const char* host, const char* endpoint) {
+  String macAddress = device.macAddress;
   Serial.print("Conectando a: ");
   Serial.println(host);
 
-  if (!http.begin(espClient, "http://" + String(host) + endpoint)) {
-    Serial.println("Falha ao iniciar a conexão");
-    return;
-  }
+  int attempts = 0;
+  const int maxAttempts = 5; // Número máximo de tentativas de conexão
 
-  int httpCode = http.GET();
+  while (attempts < maxAttempts) {
+    if (!WiFi.isConnected()) {
+      Serial.println("Reconectando ao Wi-Fi...");
+      WiFi.reconnect();
+      delay(1000); // Aguarde um momento para a conexão ser reestabelecida
+    }
 
-  if (httpCode < 0) {
-    Serial.println("Erro na requisição - " + String(httpCode));
+    if (!http.begin(espClient, "http://192.168.18.220:3001/managing-system/00:1B:44:11:3A:B7")) {
+      Serial.println("Falha ao iniciar a conexão");
+      delay(1000); // Aguarde antes de tentar novamente
+      attempts++;
+      continue; // Tenta novamente
+    }
+
+    http.setTimeout(10000); // Ajuste do tempo limite para 10 segundos
+
+    int httpCode = http.GET();
+
+    if (httpCode < 0) {
+      Serial.println("Erro na requisição - " + String(http.errorToString(httpCode).c_str()));
+      http.end();
+      delay(1000); // Aguarde antes de tentar novamente
+      attempts++;
+      continue; // Tenta novamente
+    }
+
+    if (httpCode != HTTP_CODE_OK) {
+      Serial.println("Erro na resposta do servidor - Código: " + String(httpCode));
+      http.end();
+      delay(1000); // Aguarde antes de tentar novamente
+      attempts++;
+      continue; // Tenta novamente
+    }
+
+    String payload = http.getString();
+
+    Serial.println("##[RESULT]## ==> " + payload);
     http.end();
-    return;
+    return; // Conexão bem-sucedida, sai da função
   }
 
-  if (httpCode != HTTP_CODE_OK) {
-    Serial.println("Erro na resposta do servidor");
-    http.end();
-    return;
-  }
-
-  String payload = http.getString();
-
-  http.end();
-
-  Serial.println("##[RESULT]## ==> " + payload);
+  Serial.println("Não foi possível estabelecer a conexão após várias tentativas.");
 }
+
 
 void monitor(){
   int currentHour = timeClient.getHours();
@@ -122,8 +139,8 @@ void analyser(int hour){
     // Pode ser retornado true aqui se necessário
     // executor(<valor de 1 hora>);
   } else {
-    //  makeHttpRequest("192.168.18.220:3001", "/devices");
-    //chamar requisição HTTP para aquamon e verificar se tem adaptação por volume
+    verifyAdaptation("192.168.18.220:3001", "/managing-system");
+    //  chamar requisição HTTP para aquamon e verificar se tem adaptação por volume
   }
 }
 
@@ -176,12 +193,6 @@ void loop() {
 
   int currentHour = timeClient.getHours();
 
-  if(previousBattery < 25){
-    previousBattery = 100;
-  }
-
-  int currentBattery = max(previousBattery - 1, 0);
-
   float distance = readDistanceSensor();
   float voltage = readVoltageSensor();
 
@@ -192,7 +203,7 @@ void loop() {
   Serial.print(distance);
 
   String macAddress = device.macAddress;
-  String message = "{\"distance\": " + String(distance) + ", \"battery\": " + String(currentBattery) + ", \"timestamp\": " + String(timestamp) + "}";
+  String message = "{\"distance\": " + String(distance) + ", \"voltage\": " + String(voltage) + ", \"timestamp\": " + String(timestamp) + "}";
 
   Serial.print("\t Enviando mensagem para o tópico: ");
   Serial.println(macAddress);
@@ -200,8 +211,6 @@ void loop() {
   Serial.println(message);
 
   client.publish(macAddress.c_str(), message.c_str());
-  
-  previousBattery = currentBattery;
 
   monitor();
 
