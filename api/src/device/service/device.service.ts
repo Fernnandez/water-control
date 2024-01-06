@@ -145,6 +145,33 @@ export class DeviceService {
     return Number((currentVolume * 1000).toFixed(2));
   }
 
+  calcPercentBattery(voltage: number) {
+    // Fator de ajuste para a relação entre as resistências do divisor de tensão
+    const ratioFactor = 1.27;
+
+    const vinMin = 2.8;
+    const vinMax = 4.2;
+
+    // Convert Voltage in 3.3v factor
+    const rVoltage = (voltage / 1024.0) * 3.3;
+
+    const fVoltage = rVoltage * ratioFactor;
+
+    // Limitar a voltagem medida aos limites dados
+    const measureVoltage = Math.min(Math.max(fVoltage, vinMin), vinMax);
+
+    // Calcular a diferença total
+    const totalDiff = vinMax - vinMin;
+
+    // Calcular o percentual usando a fórmula de interpolação linear
+    let percent = ((measureVoltage - vinMin) / totalDiff) * 100;
+
+    // Garantir que o percentual está dentro do intervalo [0, 100]
+    percent = Math.min(Math.max(percent, 0.0), 100.0);
+
+    return percent;
+  }
+
   mapDeviceToAggregatedHistory(device: Device): DeviceWithAggregatedHistory {
     const aggregatedHistory: AggregatedDeviceHistory[] = [];
 
@@ -184,6 +211,8 @@ export class DeviceService {
 
       const currentVolume = this.calcCurrentVolume(dto.distance, device);
 
+      const currentBattery = this.calcPercentBattery(dto.voltage);
+
       const currentPercentage = (
         (currentVolume * 100) /
         device.maxCapacity
@@ -195,13 +224,13 @@ export class DeviceService {
 
       this.deviceHistoryService.create({
         water: Number(currentVolume),
-        battery: Number(dto.battery),
+        battery: Number(currentBattery),
         timestamp: new Date(dto.timestamp * 1000),
         device,
       });
       this.deviceRepository.update(device.id, {
         percentage: Number(currentPercentage),
-        battery: Number(dto.battery),
+        battery: Number(currentBattery),
         water: Number(currentVolume),
       });
     });

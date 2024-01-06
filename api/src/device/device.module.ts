@@ -11,5 +11,6 @@ import { DeviceService } from './service/device.service';
   imports: [TypeOrmModule.forFeature([Device, DeviceHistory]), MqttModule],
   controllers: [DeviceController],
   providers: [DeviceService, DeviceHistoryService],
+  exports: [DeviceService],
 })
 export class DeviceModule {}

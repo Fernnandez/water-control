@@ -5,6 +5,7 @@ import { Device } from './device/entity/device.entity';
 import { DeviceModule } from './device/device.module';
 import { MqttModule } from './mqtt/mqtt.module';
 import { DeviceHistory } from './device/entity/device-history.entity';
+import { ManangingSystemModule } from './managing-system/managing-system.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { DeviceHistory } from './device/entity/device-history.entity';
     }),
     DeviceModule,
     MqttModule,
+    ManangingSystemModule,
   ],
   providers: [],
 })
