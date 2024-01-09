@@ -3,13 +3,14 @@
 #include <NTPClient.h>
 #include <PubSubClient.h>
 #include <ESP8266HTTPClient.h>
+#include <ArduinoJson.h>
 
 #define TrigPin 12
 #define EchoPin 14
 
 /********** WiFi Connection Details **********/
-const char* ssid = "DTEL_ALBERES_2.4";
-const char* password = "#MFDO1983@";
+const char* ssid = "CINGUESTS";
+const char* password = "acessocin";
 
 /********** MQTT Broker Connection Details **********/
 const char* mqtt_server = "broker.hivemq.com"; // public MQTT broker
@@ -35,9 +36,11 @@ struct Device {
   int height;
 };
 
+// 0.5 height, 0.65 base radius, 665 l
+
 Device device = {
   "00:1B:44:11:3A:B7",
-  200,
+  50,
 };
 
 /************* Connect to WiFi ***********/
@@ -88,7 +91,7 @@ void verifyAdaptation(const char* host, const char* endpoint) {
       delay(1000); // Aguarde um momento para a conexão ser reestabelecida
     }
 
-    if (!http.begin(espClient, "http://192.168.18.220:3001/managing-system/00:1B:44:11:3A:B7")) {
+    if (!http.begin(espClient, "http://172.22.71.193:3001/managing-system/00:1B:44:11:3A:B7")) {
       Serial.println("Falha ao iniciar a conexão");
       delay(1000); // Aguarde antes de tentar novamente
       attempts++;
@@ -115,16 +118,31 @@ void verifyAdaptation(const char* host, const char* endpoint) {
       continue; // Tenta novamente
     }
 
-    String payload = http.getString();
+     String payload = http.getString();
+  
+    // Criando um objeto JSON para analisar o payload
+    StaticJsonDocument<200> jsonDocument; // 200 é o tamanho do buffer
+  
+    // Analisando o payload e verificando se foi feita com sucesso
+    DeserializationError error = deserializeJson(jsonDocument, payload);
+
+    if (error) {
+      Serial.println("Falha na análise JSON");
+      http.end();
+      return;
+    }
 
     Serial.println("##[RESULT]## ==> " + payload);
+
+    int deepSleepValue = jsonDocument["deepSleep"];
+
+    executor(deepSleepValue);
     http.end();
     return; // Conexão bem-sucedida, sai da função
   }
 
   Serial.println("Não foi possível estabelecer a conexão após várias tentativas.");
 }
-
 
 void monitor(){
   int currentHour = timeClient.getHours();
@@ -137,7 +155,7 @@ void analyser(int hour){
     Serial.println("A hora está entre meia noite e cinco da manhã.");
     // Faça o que precisa ser feito durante este intervalo de tempo
     // Pode ser retornado true aqui se necessário
-    // executor(<valor de 1 hora>);
+    executor(3600);
   } else {
     verifyAdaptation("192.168.18.220:3001", "/managing-system");
     //  chamar requisição HTTP para aquamon e verificar se tem adaptação por volume
@@ -171,6 +189,7 @@ void reconnect() {
 
 void setup() {
   Serial.begin(9600);
+  Serial.setTimeout(2000);
   
   pinMode(TrigPin, OUTPUT);
   pinMode(EchoPin, INPUT);
@@ -181,9 +200,13 @@ void setup() {
   
   timeClient.begin();
   timeClient.setTimeOffset(-10800);
+
+  execute();
+
+  ESP.deepSleep(updateInterval * 1000000);
 }
 
-void loop() {
+void execute(){
   if (!client.connected()) reconnect();
   client.loop();
 
@@ -215,6 +238,6 @@ void loop() {
   monitor();
 
   digitalWrite(LED_BUILTIN, HIGH);
-
-  delay(updateInterval);
 }
+
+void loop() {}
