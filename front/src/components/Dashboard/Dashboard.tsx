@@ -55,6 +55,7 @@ export const Dashboard = () => {
             handleOpenModal={() => handleOpenModal()}
             address={selectedDevice.address}
             mac={selectedDevice.mac}
+            remainingDays={selectedDevice.remainingDays}
             baseRadius={selectedDevice.baseRadius}
             height={selectedDevice.height}
             maxCapacity={selectedDevice.maxCapacity}

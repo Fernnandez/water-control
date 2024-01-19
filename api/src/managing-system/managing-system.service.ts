@@ -14,17 +14,17 @@ export class ManangingSystemService {
   async analiser(device: Device) {
     if (device.percentage > 50) {
       // 1 hora
-      return this.planner(60);
+      return this.planner(10);
     }
 
     if (device.percentage < 50 && device.percentage > 25) {
       // 30 minutos
-      return this.planner(30);
+      return this.planner(5);
     }
 
     if (device.percentage < 25) {
       // 15 minutos
-      return this.planner(15);
+      return this.planner(2);
     }
   }
 

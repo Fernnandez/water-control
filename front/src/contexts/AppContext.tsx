@@ -15,6 +15,7 @@ export interface IDevice {
   water: string;
   percentage: string;
   maxCapacity: string;
+  remainingDays: number;
   height: string;
   baseRadius: string;
   aggregatedHistory: AggregatedDeviceHistory[];

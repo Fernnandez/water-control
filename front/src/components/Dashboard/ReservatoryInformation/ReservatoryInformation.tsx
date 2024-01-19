@@ -7,6 +7,7 @@ import {
   Paper,
   Text,
   Title,
+  Tooltip,
   rem,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
@@ -26,6 +27,7 @@ interface ReservatoryInformationProps {
   height: string;
   baseRadius: string;
   water: string;
+  remainingDays: number;
 }
 
 export const ReservatoryInformation = ({
@@ -38,6 +40,7 @@ export const ReservatoryInformation = ({
   maxCapacity,
   name,
   water,
+  remainingDays,
 }: ReservatoryInformationProps) => {
   const { deleteDevice } = useDevice();
   const navigate = useNavigate();
@@ -143,19 +146,29 @@ export const ReservatoryInformation = ({
             <Text color="dimmend">{baseRadius}M</Text>
           </Group>
         </Grid.Col>
-        <Grid.Col span={12}>
+        <Grid.Col span={6}>
           <Group spacing={'xs'}>
             <Title order={5}>Current Volume:</Title>
             <Text color="dimmend">{water}L</Text>
           </Group>
         </Grid.Col>
-        <Grid.Col span={12}>
+        <Grid.Col span={6}>
           <Group spacing={'xs'}>
             <Title order={5}>Max Volume:</Title>
             <Text size="md" color="dimmend">
               {maxCapacity}L
             </Text>
           </Group>
+        </Grid.Col>
+        <Grid.Col span={12}>
+          <Tooltip label={'É considerado um consumo diario de 100L'}>
+            <Group spacing={'xs'}>
+              <Title order={5}>Abastecimento Restante</Title>
+              <Text size="md" color="dimmend">
+                {remainingDays} dias
+              </Text>
+            </Group>
+          </Tooltip>
         </Grid.Col>
       </Grid>
     </Paper>

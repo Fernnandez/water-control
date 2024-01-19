@@ -16,6 +16,7 @@ interface AggregatedDeviceHistory {
 
 interface DeviceWithAggregatedHistory extends Device {
   aggregatedHistory: AggregatedDeviceHistory[];
+  remainingDays: number;
 }
 
 // Função auxiliar para formatar a data no formato 'DD/MM/YY'
@@ -188,7 +189,6 @@ export class DeviceService {
     // Calcula o volume máximo de água e nível de bateria por dia
     for (const date in groupedHistory) {
       const historyList = groupedHistory[date];
-
       aggregatedHistory.push({
         date: formatDate(date),
         volume: historyList[historyList.length - 1].water,
@@ -196,9 +196,19 @@ export class DeviceService {
       });
     }
 
+    const remainingDays = () => {
+      // Verifica se o consumo diário é válido
+      if (device.water <= 0) {
+        return 0;
+      }
+      // Calcula o número de dias restantes
+      return Math.floor(device.water / 100);
+    };
+
     const deviceWithAggregatedHistory: DeviceWithAggregatedHistory = {
       ...device,
       aggregatedHistory,
+      remainingDays: remainingDays(),
     };
 
     return deviceWithAggregatedHistory;

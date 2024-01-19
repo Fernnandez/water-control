@@ -9,8 +9,8 @@
 #define EchoPin 14
 
 /********** WiFi Connection Details **********/
-const char* ssid = "CINGUESTS";
-const char* password = "acessocin";
+const char* ssid = "DTEL_ALBERES_2.4";
+const char* password = "#mfdo1983@";
 
 /********** MQTT Broker Connection Details **********/
 const char* mqtt_server = "broker.hivemq.com"; // public MQTT broker
@@ -46,19 +46,19 @@ Device device = {
 /************* Connect to WiFi ***********/
 void setupWiFi() {
   delay(10);
-  Serial.print("\nConnecting to ");
-  Serial.println(ssid);
+  // Serial.print("\nConnecting to ");
+  // Serial.println(ssid);
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.print(".");
+    // Serial.print(".");
   }
 
-  Serial.println("\nWiFi connected\nIP address: ");
-  Serial.println(WiFi.localIP());
+  // Serial.println("\nWiFi connected\nIP address: ");
+  // Serial.println(WiFi.localIP());
 }
 
 float readDistanceSensor() {
@@ -78,8 +78,8 @@ float readVoltageSensor() {
 
 void verifyAdaptation(const char* host, const char* endpoint) {
   String macAddress = device.macAddress;
-  Serial.print("Conectando a: ");
-  Serial.println(host);
+  // Serial.print("Conectando a: ");
+  // Serial.println(host);
 
   int attempts = 0;
   const int maxAttempts = 5; // Número máximo de tentativas de conexão
@@ -91,7 +91,7 @@ void verifyAdaptation(const char* host, const char* endpoint) {
       delay(1000); // Aguarde um momento para a conexão ser reestabelecida
     }
 
-    if (!http.begin(espClient, "http://172.22.71.193:3001/managing-system/00:1B:44:11:3A:B7")) {
+    if (!http.begin(espClient, "http://192.168.18.220:3001/managing-system/00:1B:44:11:3A:B7")) {
       Serial.println("Falha ao iniciar a conexão");
       delay(1000); // Aguarde antes de tentar novamente
       attempts++;
@@ -188,6 +188,7 @@ void reconnect() {
 }
 
 void setup() {
+  unsigned long startTime;  // Variável para armazenar o tempo de início
   Serial.begin(9600);
   Serial.setTimeout(2000);
   
@@ -199,9 +200,20 @@ void setup() {
   client.setServer(mqtt_server, mqtt_port);
   
   timeClient.begin();
+
+  // Obter o tempo de início
+  startTime = millis();
+
   timeClient.setTimeOffset(-10800);
 
   execute();
+
+
+  // Calcular o tempo decorrido e imprimir
+  unsigned long elapsedTime = millis() - startTime;
+  Serial.print("Tempo de execução: ");
+  Serial.print(elapsedTime);
+  Serial.println(" ms");
 
   ESP.deepSleep(updateInterval * 1000000);
 }
@@ -228,10 +240,10 @@ void execute(){
   String macAddress = device.macAddress;
   String message = "{\"distance\": " + String(distance) + ", \"voltage\": " + String(voltage) + ", \"timestamp\": " + String(timestamp) + "}";
 
-  Serial.print("\t Enviando mensagem para o tópico: ");
-  Serial.println(macAddress);
-  Serial.print("Mensagem: ");
-  Serial.println(message);
+  // Serial.print("\t Enviando mensagem para o tópico: ");
+  // Serial.println(macAddress);
+  // Serial.print("Mensagem: ");
+  // Serial.println(message);
 
   client.publish(macAddress.c_str(), message.c_str());
 
